@@ -19,7 +19,10 @@ if settings.REDIS:
   import redis_cache
   from redis_cache import get_redis_connection
   import msgpack
-
+  
+###################
+## Abandoned function? Does nothing.
+###################
 def new_ps(request):  
   ps_nodes = Sitc4.objects.get_all("en")
   return render_to_response("new_ps.html", {"ps_nodes":json.dumps(ps_nodes, indent=2)},context_instance=RequestContext(request))
@@ -932,6 +935,10 @@ def embed(request, app_name, trade_flow, country1, country2, product, year):
   query_string["product_classification"] = prod_class
   return render_to_response("explore/embed.html", {"app":app_name, "trade_flow": trade_flow, "country1":country1, "country2":country2, "product":product, "year":year, "other":json.dumps(query_string), "lang":lang})
 
+
+###################
+## Abandoned function? Coresponding model/tables 'wdi' & 'wdi_cwy' 
+###################
 def get_similar_productive(country, year):
   # correlation = request.GET.get("c", "pearson")
   import math
@@ -965,6 +972,9 @@ def get_similar_productive(country, year):
   # raise Exception(cor_func(country_vectors[50], country_vectors[105]))
   return render_to_response("explore/similar.html", {"cors": cors})
 
+###################
+## Abandoned function? Coresponding model/tables 'wdi' & 'wdi_cwy' 
+###################
 def similar_wdi(request, country, indicator, year):
   y = int(year)
   c = clean_country(country)
@@ -980,6 +990,8 @@ def similar_wdi(request, country, indicator, year):
     values = list(wdis.values_list("country__name_en", "country__name_3char", "value"))
     name = i.name
   return HttpResponse(json.dumps({"index": this_index, "values":values, "wdi": name}))
+
+
 
 ###############################################################################
 ## Helpers
