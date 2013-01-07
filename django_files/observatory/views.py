@@ -20,6 +20,12 @@ if settings.REDIS:
   from redis_cache import get_redis_connection
   import msgpack
   
+  
+  
+  
+def fluid(request):
+  return render_to_response("fluid.html", context_instance=RequestContext(request))
+  
 ###################
 ## Abandoned function? Does nothing.
 ###################

@@ -6,7 +6,7 @@ from django.views.generic.simple import redirect_to
 urlpatterns = patterns('',
 
   (r'^$', 'observatory.views.bloom_home'),
-  
+  (r'^fluid/$', 'observatory.views.fluid'),
   #############################################
   ## BEYOND THIS POINT THESE ARE LEGACY URL PATTERNS, 
   ##     ---> antiquated & medieval <---

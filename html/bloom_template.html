@@ -6,21 +6,13 @@
 
   <title>The Observatory of Economic Complexity :: {% block page_title %}{% endblock %}</title>
   <meta name="description" content="Networks in Macro Economics">
-  <meta name="author" content="Alexander Simoes">
+  <meta name="author" content="Eric Franco">
 
   <link rel="shortcut icon" type="image/x-icon" href="/media/img/favicon.ico">
 
-  <!-- Load non-standard fonts -->
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
-  <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow' rel='stylesheet' type='text/css' />
-  <link href='http://fonts.googleapis.com/css?family=Cardo' rel='stylesheet' type='text/css' />
+	<!-- Lets make this a bootstrap template. -->
+	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 
-  <link rel="stylesheet" href="/media/css/normalize.css">
-  <link rel="stylesheet" href="/media/css/style.css">	
-  <link rel="stylesheet" href="/media/js/libs/chosen/chosen.css" />
-  <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
   {% block css %}{% endblock %}
 </head>
 <body>
@@ -63,7 +55,7 @@
 
     <footer>
       <p>
-        <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">The Observatory of Economic complexity</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://atlas.media.mit.edu/" property="cc:attributionName" rel="cc:attributionURL">Alexander Simoes</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.<br />Permissions beyond the scope of this license may be available at <a xmlns:cc="http://creativecommons.org/ns#" href="http://atlas.media.mit.edu/about/permissions/" rel="cc:morePermissions">http://atlas.media.mit.edu/about/permissions/</a>.
+        <span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">The Observatory of Economic complexity</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://atlas.media.mit.edu/" property="cc:attributionName" rel="cc:attributionURL">Al Jaffey</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.<br />Permissions beyond the scope of this license may be available at <a xmlns:cc="http://creativecommons.org/ns#" href="http://atlas.media.mit.edu/about/permissions/" rel="cc:morePermissions">http://atlas.media.mit.edu/about/permissions/</a>.
         <br />
         <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a>
       </p>
@@ -77,33 +69,8 @@
 
   <script src="/media/js/libs/jquery/jquery-1.7.1.min.js"></script>	
 	<script src="/media/js/libs/chosen/chosen.jquery.min.js" ></script>
-  <script>
+	<script src="js/bootstrap.min.js"></script>
 	
-	// language select dropdown
-	$(".language_select select").chosen();
-	$(".language_select .chzn-search").hide();
-	$(".language_select select").chosen().change(function(){
-		// set session data to new language
-		var language = $(this).val();
-		window.location = "/set_language/"+language+"/";
-	});
-	
-  // google analytics
-  var _gaq=[['_setAccount','UA-22403682-3'],['_trackPageview']]; 
-  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-  g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-  s.parentNode.insertBefore(g,s)}(document,'script'));
-
-  // current nav styling
-	$(function(){
-		var current_page = document.location.pathname.split("/")[1];
-		$("nav ul a").each(function(i, el){
-			if($(el).text().toLowerCase() == current_page){
-				$(el).addClass("current");
-			}
-		})
-	})
-	</script>
 	{% block js %}{% endblock %}
 	
 </body>
