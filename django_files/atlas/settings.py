@@ -93,7 +93,8 @@ INSTALLED_APPS = (
   'django.contrib.staticfiles',
   'django.contrib.humanize',
   'observatory',
-  'blog'
+  'blog',
+  'usa'
 )
 
 

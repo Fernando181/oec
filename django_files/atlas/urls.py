@@ -4,14 +4,10 @@ from django.conf.urls.defaults import *
 from django.views.generic.simple import redirect_to
 
 urlpatterns = patterns('',
-
-  (r'^$', 'observatory.views.bloom_home'),
-  (r'^fluid/$', 'observatory.views.fluid'),
-  #############################################
-  ## BEYOND THIS POINT THESE ARE LEGACY URL PATTERNS, 
-  ##     ---> antiquated & medieval <---
-  #############################################
-
+  
+  (r'^build/hs4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'observatory.views.explore'),
+  
+  
   (r'^new_ps/', 'observatory.views.new_ps'),
   # internationalization ######################################################
   (r'^i18n/', include('django.conf.urls.i18n')),
@@ -21,7 +17,7 @@ urlpatterns = patterns('',
   (r'^set_product_classification/(?P<prod_class>[a-z0-9]{3,5})/$', 'observatory.views.set_product_classification'),
   
   # general site ############################################################
-  #(r'^$', 'observatory.views.home'),
+  (r'^$', 'observatory.views.home'),
   (r'^download/$', 'observatory.views.download'),
   
   # about section ###########################################################
@@ -52,7 +48,7 @@ urlpatterns = patterns('',
   (r'^explore/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/$', 'observatory.views.explore'),
   
   # Find similar countries
-  (r'^similar/(?P<country>\w{2,3})/(?P<year>[0-9\.]+)/$', 'observatory.views.get_similar_productive'),
+  # (r'^similar/(?P<country>\w{2,3})/(?P<year>[0-9\.]+)/$', 'observatory.views.similar'),
   (r'^similar_wdi/(?P<country>\w{2,3})/(?P<indicator>\d+)/(?P<year>[0-9\.]+)/$', 'observatory.views.similar_wdi'),
     
   # Embed URL
