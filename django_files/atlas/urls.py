@@ -2,11 +2,18 @@
 #from django.conf.urls import patterns, url
 from django.conf.urls.defaults import *
 from django.views.generic.simple import redirect_to
+from django.conf.urls import patterns, include
 
 urlpatterns = patterns('',
   
-  (r'^build/hs4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'observatory.views.explore'),
+  ## Exploring new patterns
+  #(r'^redesign/', include('redesign.urls')),
+  (r'^usa/', include('usa.urls')),
+  (r'^redesign/', include('redesign.urls')),
   
+  ####                       
+  ## Revisiting old patterns 
+  ####                    
   
   (r'^new_ps/', 'observatory.views.new_ps'),
   # internationalization ######################################################

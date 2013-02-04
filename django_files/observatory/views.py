@@ -942,6 +942,10 @@ def embed(request, app_name, trade_flow, country1, country2, product, year):
   return render_to_response("explore/embed.html", {"app":app_name, "trade_flow": trade_flow, "country1":country1, "country2":country2, "product":product, "year":year, "other":json.dumps(query_string), "lang":lang})
 
 
+
+
+
+
 ###################
 ## Abandoned function? Coresponding model/tables 'wdi' & 'wdi_cwy' 
 ###################

@@ -94,7 +94,8 @@ INSTALLED_APPS = (
   'django.contrib.humanize',
   'observatory',
   'blog',
-  'usa'
+  'usa',
+  'redesign'
 )
 
 
