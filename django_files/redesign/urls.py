@@ -8,11 +8,11 @@ urlpatterns = patterns('',
     (r'^country/(?P<country>\w{2,3})/','redesign.views.country'),
     
     # HS4 CLASS
-    (r'^build/hs4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.build', {'classification':'hs4'}),
-    (r'^build/hs4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/$', 'redesign.views.build', {'classification':'hs4'}),  
+    (r'^build/hs4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>\w{3,4})/(?P<destination>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.build', {'classification':'hs4'}),
+    (r'^build/hs4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>\w{3,4})/(?P<destination>\w{3,4})/(?P<product>\w{3,4})/$', 'redesign.views.build', {'classification':'hs4'}),  
     # SITC4 CLASS
-    (r'^build/sitc4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.build', {'classification':'sitc4'}),
-    (r'^build/sitc4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<country1>\w{3,4})/(?P<country2>\w{3,4})/(?P<product>\w{3,4})/$', 'redesign.views.build', {'classification':'sitc4'}),
+    (r'^build/sitc4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>\w{3,4})/(?P<destination>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.build', {'classification':'sitc4'}),
+    (r'^build/sitc4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>\w{3,4})/(?P<destination>\w{3,4})/(?P<product>\w{3,4})/$', 'redesign.views.build', {'classification':'sitc4'}),
     
     #  Instances of US data buids
     # MSA CLASS

@@ -21,75 +21,46 @@ def country(request, country):
       return HttpResponse("Is that a new country? Never heard of it.")  
   return HttpResponse(c)  
 
-def build(request,app_name,trade_flow,country1,country2,product,classification,year=2008):
+def build(request, app_name, trade_flow, origin, destination, product, 
+            classification, year=2010):
+  
+  # make sure app name is in the list of possiblities
+  app_name = get_app_name(app_name) or "tree_map"
+  
+  # make sure trade flow is in the list of possiblities
+  trade_flow = get_trade_flow(trade_flow) or "export"
   
   # get distinct years for the given dataset
   years = get_years(classification)
   
-  output = "Redesign says Hello World!"
-  return HttpResponse(output)
+  # get the format of the app
+  app_type = get_app_type(origin, destination, product, year)
+   
+  # get our countries from the db
+  origin = get_country(origin) or origin
+  destination = get_country(destination) or destination
+  
+  # get our product name from the db
+  product = get_product(product, classification) or product
+  
+  # get the question for the data requested by the URL
+  question = get_question(app_type, origin=origin, trade_flow=trade_flow, 
+                            product=product, destination=destination)
+  
+  # Return page without visualization data
+  return render_to_response("explore/index.html", {
+     "question": question,
+     "trade_flow": trade_flow,
+     "origin": origin,
+     "destination": destination,
+     "product": product,
+     "year": year,
+     "years": years,
+     "app_name": app_name,
+     "app_type": app_type
+    }, context_instance=RequestContext(request))
 
 
-# Returns the Country object or None
-def get_country(country):
-  # first try looking up based on 3 character code
-  try:
-    c = Country.objects.get(name_3char=country)
-  except Country.DoesNotExist:
-    # next try 2 character code
-    try:
-      c = Country.objects.get(name_2char=country)
-    except Country.DoesNotExist:
-      c = None
-  return c
-
-# Returns the Product object or None
-def get_product(product, prod_class):
-  # first try looking up based on 3 character code
-  if prod_class == "hs4":
-    try:
-      p = Hs4.objects.get(code=product)
-    except Hs4.DoesNotExist:
-      # next try SITC4
-      try:
-        conv_code = Sitc4.objects.get(code=product).conversion_code
-        p = Hs4.objects.get(code=conv_code)
-      except Hs4.DoesNotExist:
-        p = None
-  else:
-    try:
-      p = Sitc4.objects.get(code=product)
-    except Sitc4.DoesNotExist:
-      # next try SITC4
-      try:
-        conv_code = Hs4.objects.get(code=product).conversion_code
-        p = Sitc4.objects.get(code=conv_code)
-      except Hs4.DoesNotExist:
-        p = None
-  return p
-
-# Returns app type in CCPY format  
-def get_app_type(country1, country2, product, year):
-  # country / all / show / year
-  if country2 == "all" and product == "show":
-    return "casy"
-  
-  # country / show / all / year
-  elif country2 == "show" and product == "all":
-    return "csay"
-  
-  # show / all / product / year
-  elif country1 == "show" and country2 == "all":
-    return "sapy"
-  
-  # country / country / show / year
-  elif product == "show":
-    return "ccsy"
-  
-  #  country / show / product / year
-  else:
-    return "cspy"  
-    
 def predict(request, country):
   c = get_country(country)
   
