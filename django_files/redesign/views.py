@@ -2,7 +2,8 @@
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.http import HttpResponse
-from redesign.models import *
+from observatory.models import *
+from redesign.helpers import *
 import math
 
 def index(request):
@@ -22,14 +23,11 @@ def country(request, country):
 
 def build(request,app_name,trade_flow,country1,country2,product,classification,year=2008):
   
-  # get distince years from db, different for diff product classifications
-  years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if classification == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
-  years_available.sort()
-  
-  
+  # get distinct years for the given dataset
+  years = get_years(classification)
   
   output = "Redesign says Hello World!"
-  return HttpResponse(years_available)
+  return HttpResponse(output)
 
 
 # Returns the Country object or None
