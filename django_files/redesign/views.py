@@ -1,7 +1,9 @@
 # Create your views here.
-
+from django.shortcuts import render_to_response, redirect
+from django.template import RequestContext
 from django.http import HttpResponse
 from redesign.models import *
+import math
 
 def index(request):
   output = "Redesign Index"
@@ -67,6 +69,8 @@ def get_product(product, prod_class):
       except Hs4.DoesNotExist:
         p = None
   return p
+
+# Returns app type in CCPY format  
 def get_app_type(country1, country2, product, year):
   # country / all / show / year
   if country2 == "all" and product == "show":
@@ -87,3 +91,31 @@ def get_app_type(country1, country2, product, year):
   #  country / show / product / year
   else:
     return "cspy"  
+    
+def predict(request, country):
+  c = get_country(country)
+  
+  ### Present
+  cepiis_present_list = Hs4_Cepii.objects.filter(iso=country,present=1)
+  #cepiis_present = ['{percent:.2%}'.format(percent=float(elem.m_resid)) for elem in cepiis_present_list]
+  
+  remain_present = []
+  disappear = []
+  for item in cepiis_present_list:
+    if math.fabs(item.m_resid) >= 0.5:
+      disappear.append(item)
+    else:
+      remain_present.append(item)
+  
+  ### Absent
+  cepiis_absent_list = Hs4_Cepii.objects.filter(iso=country,absent=1)
+  appear = []
+  remain_absent = []
+  for item in cepiis_absent_list:
+    if math.fabs(item.m_resid) >= 0.5:
+      appear.append(item)
+    else:
+      remain_absent.append(item)  
+      
+      
+  return render_to_response("redesign/predict.html",{'country':c, 'cepii_present':cepiis_present_list,'cepii_absent':cepiis_absent_list,'disappear':disappear,'remain_present':remain_present, 'appear':appear, 'remain_absent':remain_absent}, context_instance=RequestContext(request))    

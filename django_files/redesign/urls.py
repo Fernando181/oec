@@ -26,13 +26,14 @@ urlpatterns = patterns('',
     (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/$', 'usa.views.build', {'classification':'msa'}),
     
     # BLOG ##################################################################
-    (r'^blog/$', "blog.views.blog_index")
+    (r'^blog/$', "blog.views.blog_index"),
     
     # ATLAS ##################################################################
     
     # ABOUT ##################################################################
     
-    
+    # Prediction
+    (r'^predict/(?P<country>\w{3,4})/$', "redesign.views.predict")
     
     
 )

@@ -74,7 +74,7 @@ class Country(models.Model):
 	
 	objects = Country_manager()
   
-class Cy(models.Model):
+class Country_Cy(models.Model):
   country = models.ForeignKey(Country)
   year = models.PositiveSmallIntegerField(max_length=4)
   eci = models.FloatField(null=True)
@@ -250,6 +250,31 @@ class Hs4(models.Model):
 	objects = Hs4_manager()
   
   
+##########
+# Predictions
+##########
+class Hs4_Cepii(models.Model):
+    id = models.IntegerField(primary_key=True)
+    country = models.CharField(max_length=765, blank=True)
+    iso = models.CharField(max_length=300, blank=True)
+    product = models.CharField(max_length=765, blank=True)
+    hs4 = models.IntegerField(null=True, blank=True)
+    rca = models.FloatField(null=True, blank=True)
+    present = models.IntegerField(null=True, blank=True)
+    absent = models.IntegerField(null=True, blank=True)
+    m_resid = models.FloatField(null=True, db_column='M_resid', blank=True) # Field name made lowercase.
+    log_rca_resid = models.FloatField(null=True, blank=True)
+    densityps = models.FloatField(null=True, db_column='densityPS', blank=True) # Field name made lowercase.
+    densitycs = models.FloatField(null=True, db_column='densityCS', blank=True) # Field name made lowercase.
+    contdensityps = models.FloatField(null=True, db_column='contDensityPS', blank=True) # Field name made lowercase.
+    contdensitycs = models.FloatField(null=True, db_column='contDensityCS', blank=True) # Field name made lowercase.
+    
+    def __unicode__(self):
+      return self.iso + self.product
+    
+    class Meta:
+        db_table = u'redesign_hs4_cepii'
+
 
 ###############################################################################
 # Country - Product - Year tables
