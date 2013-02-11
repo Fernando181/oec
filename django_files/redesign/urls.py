@@ -14,17 +14,18 @@ urlpatterns = patterns('',
     (r'^build/sitc4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>\w{3,4})/(?P<destination>\w{3,4})/(?P<product>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.build', {'classification':'sitc4'}),
     (r'^build/sitc4/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>\w{3,4})/(?P<destination>\w{3,4})/(?P<product>\w{3,4})/$', 'redesign.views.build', {'classification':'sitc4'}),
     
+  
     #  Instances of US data buids
+    # County Class
+    (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>[\w-]{2,34})/(?P<destination>\w{3,4})/(?P<industry>\w{4,6})/(?P<value>\w{3})/(?P<year>[0-9\.]+)/$', 'usa.views.build', {'classification':'county'}),
+    (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>[\w-]{2,34})/(?P<destination>\w{3,4})/(?P<industry>\w{4,6})/(?P<value>\w{3})/$', 'usa.views.build', {'classification':'county'}),
+    (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<origin>[\w-]{2,34})/(?P<destination>\w{3,4})/(?P<industry>\w{4,6})/$', 'usa.views.build', {'classification':'county'}),
+  
     # MSA CLASS
     (r'^build/msa/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/(?P<value>\w{3})/(?P<year>[0-9\.]+)/$', 'usa.views.build', {'classification':'msa'}),
     (r'^build/msa/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/(?P<value>\w{3})/$', 'usa.views.build', {'classification':'msa'}),
     (r'^build/msa/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/$', 'usa.views.build', {'classification':'msa'}),
   
-    # County Class
-    (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/(?P<value>\w{3})/(?P<year>[0-9\.]+)/$', 'usa.views.build', {'classification':'msa'}),
-    (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/(?P<value>\w{3})/$', 'usa.views.build', {'classification':'msa'}),
-    (r'^build/county/(?P<app_name>[a-z_]+)/(?P<trade_flow>\w{6,10})/(?P<source>\d{5})/(?P<destination>\w{3,4})/(?P<industry>\w{3,4})/$', 'usa.views.build', {'classification':'msa'}),
-    
     # BLOG ##################################################################
     (r'^blog/$', "blog.views.blog_index"),
     

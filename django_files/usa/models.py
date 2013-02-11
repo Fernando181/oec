@@ -3,11 +3,10 @@ from observatory.models import *
 
 class County(models.Model):
     id = models.IntegerField(primary_key=True)
-    fipstate = models.IntegerField()
-    fipscounty = models.IntegerField()
-    fips = models.CharField(max_length=33)
-    state = models.CharField(max_length=9)
-    name = models.CharField(max_length=150)
+    state_id = models.IntegerField(null=True, blank=True)
+    fips_county_id = models.IntegerField(null=True, blank=True)
+    name = models.CharField(max_length=765, blank=True)
+    slug = models.CharField(max_length=765, blank=True)
     
     def __unicode__(self):
   	  return self.name  
@@ -16,9 +15,10 @@ class County(models.Model):
         db_table = u'usa_county'
 
 class State(models.Model):
-    name = models.CharField(max_length=300)
-    abbr = models.CharField(max_length=33)
-    fips = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=765, blank=True)
+    abbr = models.CharField(max_length=765, blank=True)
+    fips = models.IntegerField(null=True, blank=True)
     
     def __unicode__(self):
   	  return self.name
@@ -43,7 +43,7 @@ class Msa(models.Model):
 
 class Naics(models.Model):
     id = models.IntegerField(primary_key=True)
-    naics6 = models.IntegerField()
+    naics = models.IntegerField()
     name = models.CharField(max_length=765)
     description = models.TextField()
     
@@ -53,26 +53,24 @@ class Naics(models.Model):
     class Meta:
         db_table = u'usa_naics'
 
-class NaicsCounty(models.Model):
+class Naics_County(models.Model):
     id = models.IntegerField(primary_key=True)
-    year = models.IntegerField()
-    state = models.IntegerField()
-    county = models.IntegerField()
-    fips = models.CharField(max_length=33)
-    naics = models.IntegerField()
-    employees = models.IntegerField()
-    payroll = models.IntegerField()
-    rca_employee = models.FloatField()
-    rca_payroll = models.FloatField()
+    year = models.IntegerField(null=True, blank=True)
+    county_id = models.IntegerField(null=True, blank=True)
+    naics = models.IntegerField(null=True, blank=True)
+    employees = models.IntegerField(null=True, blank=True)
+    payroll = models.IntegerField(null=True, blank=True)
+    rca_employee = models.CharField(max_length=765, blank=True)
+    rca_payroll = models.CharField(max_length=765, blank=True)
     
     def __unicode__(self):
-  	  return "%s,%s,%s" % (self.state,self.county,self.naics,self.year) 
+  	  return "%s,%s,%s" % (self.county_id,self.naics,self.year) 
     
     
     class Meta:
         db_table = u'usa_naics_county'
 
-class NaicsMsa(models.Model):
+class Naics_Msa(models.Model):
     id = models.IntegerField(primary_key=True)
     year = models.IntegerField()
     msa = models.IntegerField()

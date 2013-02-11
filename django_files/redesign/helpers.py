@@ -32,6 +32,7 @@ def get_years(classification):
 
 # Returns app type in CCPY format  
 def get_app_type(country1, country2, product, year):
+  
   # country / all / show / year
   if country2 == "all" and product == "show":
     return "casy"
