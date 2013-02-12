@@ -1,0 +1,3 @@
+[submodule "media/js/libs/vizwiz"]
+	path = media/js/libs/vizwiz
+	url = git://github.com/alexandersimoes/vizwhiz.git

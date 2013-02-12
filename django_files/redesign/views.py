@@ -21,8 +21,7 @@ def country(request, country):
       return HttpResponse("Is that a new country? Never heard of it.")  
   return HttpResponse(c)  
 
-def build(request, app_name, trade_flow, origin, destination, product, 
-            classification, year=2010):
+def build(request, app_name, trade_flow, origin, destination, product, classification, year=2010):
   
   # make sure app name is in the list of possiblities
   app_name = get_app_name(app_name) or "tree_map"
@@ -60,7 +59,6 @@ def build(request, app_name, trade_flow, origin, destination, product,
      "app_name": app_name,
      "app_type": app_type
     }, context_instance=RequestContext(request))
-
 
 def predict(request, country):
   c = get_country(country)
