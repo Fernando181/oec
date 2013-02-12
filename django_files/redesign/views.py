@@ -30,10 +30,11 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
   trade_flow = get_trade_flow(trade_flow) or "export"
   
   # get distinct years for the given dataset
-  years = get_years(classification)
+  years_available = get_years(classification)
   
   # get the format of the app
   app_type = get_app_type(origin, destination, product, year)
+  
    
   # get our countries from the db
   origin = get_country(origin) or origin
@@ -46,6 +47,10 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
   question = get_question(app_type, origin=origin, trade_flow=trade_flow, 
                             product=product, destination=destination)
   
+  # assemble the uri
+  api_uri = "/api/%s/%s/%s/%s/%s/?%s" % (trade_flow, origin, destination, product, year, options)
+  
+  
   # Return page without visualization data
   return render_to_response("explore/index.html", {
      "question": question,
@@ -55,7 +60,7 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
      "classification": classification,
      "product": product,
      "year": year,
-     "years": years,
+     "years_available": years,
      "app_name": app_name,
      "app_type": app_type
     }, context_instance=RequestContext(request))
