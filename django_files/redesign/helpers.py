@@ -23,10 +23,12 @@ def get_trade_flow(trade_flow):
 
 def get_years(classification):
   # get distince years from db, different for diff product classifications
+  
   if classification == "sitc4":
     years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct())
   elif classification == "hs4":
     years_available = list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  
   return years_available
 
 
@@ -69,9 +71,9 @@ def get_country(country):
 
 
 # Returns the Product object or None
-def get_product(product, prod_class):
+def get_product(product, classification):
   # first try looking up based on 3 character code
-  if prod_class == "hs4":
+  if classification == "hs4":
     try:
       p = Hs4.objects.get(code=product)
     except Hs4.DoesNotExist:
