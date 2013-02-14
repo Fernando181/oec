@@ -81,14 +81,15 @@ def api_casy(request, classification, trade_flow, origin, year):
     raise Exception("%s dataset does not support the year %s."% (classification, year))
   
   ## Clasification & Django Data Call
-  if classification = "sitc4":
-    raw = Sitc4_cpy.objects.filter(country=origin.country_id).filter(year=year)
-  elif: classification = "hs4":
-    raw = Hs4_cpy.objects.filter(country=origin.country_id).filter(year=year)
+  if classification == "sitc4":
+    raw = Sitc4_cpy.objects.filter(country=origin.id).filter(year=year)
+  elif classification == "hs4":
+    raw = Hs4_cpy.objects.filter(country=origin.id).filter(year=year)
   else:
     raise Exception("Dataset not supported.")
     
   ## Trade Flow - defaults to "import" if fail 
+  #### Net Export
   if trade_flow == "net_export":
     exclude = []
     for r in raw: 
@@ -97,7 +98,11 @@ def api_casy(request, classification, trade_flow, origin, year):
     for e in exp: e.net_export =  e.export_value - e.import_value
     total_val = sum([prod.net_export for prod in exp])
     
-  elif: trade_flow == "net_import":
+    build = [{"year":e.year,"item_id":e.product.id,"abbr":e.product.code,
+              "name":e.product.name_en, "value":e.net_export,"rca":e.export_rca,
+              "share":(e.net_export / total_val) * 100} for e in exp]
+  ####  Net Import
+  elif trade_flow == "net_import":
     exclude = []
     for r in raw: 
       if (r.import_value - r.export_value) <= 0: exclude.append(r.pk)
@@ -105,14 +110,26 @@ def api_casy(request, classification, trade_flow, origin, year):
     for e in exp: e.net_import = e.import_value - e.export_value
     total_val = sum([prod.net_import for prod in exp])
     
-  elif: trade_flow == "export":
+    build = [{"year":e.year,"item_id":e.product.id,"abbr":e.product.code,
+              "name":e.product.name_en, "value":e.net_import,"rca":e.export_rca,
+              "share":(e.net_import / total_val) * 100} for e in exp]
+  ####  Export
+  elif trade_flow == "export":
     exp = raw.filter(export_value__gt=0)
     total_val = sum([prod.export_value for prod in exp])
-  
+    
+    build = [{"year":e.year,"item_id":e.product.id,"abbr":e.product.code,
+              "name":e.product.name_en, "value":e.export_value,"rca":e.export_rca,
+              "share":(e.export_value / total_val) * 100 } for e in exp]
+  #### Import
   else:
+  
     exp = raw.filter(import_value__gt=0)
     total_val = sum([prod.import_value for prod in exp])
-
+    
+    build = [{"year":e.year,"item_id":e.product.id,"abbr":e.product.code,
+              "name":e.product.name_en, "value":e.import_value,"rca":e.export_rca,
+              "share":(e.import_value / total_val) * 100 } for e in exp]
   
   # Define parameters for query
   year_where = "AND year = %s" % (year,)
@@ -141,22 +158,26 @@ def api_casy(request, classification, trade_flow, origin, year):
     ORDER BY val DESC
     """ % (lang, val_col, rca_col, classification, classification, origin.id, year_where)
   
-  rows = raw_q(query=q, params=None)
-  total_val = sum([r[4] for r in rows])
-  # Add percentage value to return vals
-  # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-  rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], 
-                "share": (r[4] / total_val)*100} for r in rows]
+  # rows = raw_q(query=q, params=None)
+  # total_val = sum([r[4] for r in rows])
+  # # Add percentage value to return vals
+  # # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
+  # rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], 
+  #               "share": (r[4] / total_val)*100} for r in rows]
+  # 
+  
+ 
   
   # Prepare JSON response
   json_response = {}
-  json_response["data"] = rows
+  json_response["data"] = build
   json_response["attr_data"] = Sitc4.objects.get_all(lang) if classification == "sitc4" else Hs4.objects.get_all(lang)
   json_response["origin"] = origin.to_json()
   json_response["class"] =  classification
   json_response["title"] = "What does %s %s?" % (origin.name, trade_flow.replace("_", " "))
   json_response["year"] = year
   json_response["item_type"] = "product"
+  json_response["total_val"] = total_val
   #json_response["other"] = query_params
   
   # Return to browser as JSON for AJAX request
