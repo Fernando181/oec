@@ -100,30 +100,54 @@ def get_product(product, classification):
 def get_question(app_type, **kwargs):
   
   trade_flow = kwargs["trade_flow"]
-  origin = kwargs["origin"] 
-  product = kwargs["product"] 
-  destination = kwargs["destination"]
   
   if app_type == "casy":
-    title = "What does %s %s?" % (origin.name, trade_flow.replace("_", " "))
+    origin = kwargs["origin"] 
+    
+    if trade_flow in ['net_export','net_import']:
+      title =  "What does %s %s in net terms?" % (origin.name, trade_flow.replace("_", " ").split()[1])
+    else:
+      title = "What does %s %s?" % (origin.name, trade_flow.replace("_", " "))
   
   # Country but showing other country trade partners
   elif app_type == "csay":
-    article = "to" if trade_flow == "export" else "from"
-    title = "Where does %s %s %s?" % (origin.name, trade_flow.replace("_", " "), article)  
+    origin = kwargs["origin"] 
+    
+    article = "to" if trade_flow in ["export","net_export"] else "from"
+    if trade_flow in ['net_export','net_import']:
+      title = "Where does %s %s %s in net terms? " % (origin.name, trade_flow.replace("_", " ").split()[1], article) 
+    else:
+      title = "Where does %s %s %s?" % (origin.name, trade_flow.replace("_", " "), article)  
   
   # Product
   elif app_type == "sapy":
-    title = "Who %ss %s?" % (trade_flow.replace("_", " "), product.name_en)
-  
+    product = kwargs["product"]
+      
+    if trade_flow in ['net_export','net_import']:
+      title = "Who %ss %s in net terms?" % (trade_flow.replace("_", " ").split()[1], product.name_en) 
+    else: 
+      title = "Who %ss %s?" % (trade_flow.replace("_", " "), product.name_en)
+    
   # Bilateral Country x Country
   elif app_type == "ccsy":
-    article = "to" if trade_flow == "export" else "from"
-    title = "What does %s %s %s %s?" % (origin.name, trade_flow, article, destination.name)
+    origin = kwargs["origin"]
+    destination = kwargs["destination"]
+    
+    article = "to" if trade_flow in ["export","net_export"] else "from"
+    if trade_flow in ['net_export','net_import']:
+      title = "What does %s %s %s %s in net terms?" % (origin.name, trade_flow.replace("_", " ").split()[1], article, destination.name)
+    else:
+      title = "What does %s %s %s %s?" % (origin.name, trade_flow, article, destination.name)
   
   # Bilateral Country / Show / Product / Year
   elif app_type == "cspy":
-    article = "to" if trade_flow == "export" else "from"
-    title = "Where does %s %s %s %s?" % (origin.name, trade_flow, product.name_en, article)
+    origin = kwargs["origin"] 
+    product = kwargs["product"]
+    
+    article = "to" if trade_flow in ["export","net_export"] else "from"
+    if trade_flow in ['net_export','net_import']:
+      title = "Where does %s %s %s %s in net terms?" % (origin.name, trade_flow.replace("_", " ").split()[1], product.name_en, article)
+    else:
+      title = "Where does %s %s %s %s?" % (origin.name, trade_flow, product.name_en, article)
   
   return title

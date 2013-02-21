@@ -531,6 +531,7 @@
     country2 = "{{country2}}",
     product = "{{product}}",
     item_type = "{{item_type}}",
+		redesign_api_uri = "{{redesign_api_uri}}"
     prod_class = "{{prod_class}}";
   
   // Use chosen plugin to make dropdowns look fancy
@@ -565,7 +566,8 @@
   // whatever you wanna call it. This is the single most important function.
   // It triggers the data call to the server to fetch the data used in turn
   // to build the app. Look in general.js for more info.
-  build_app(api_uri, "{{app_name}}", [640, 520]);
+
+  build_app(redesign_api_uri, "{{app_name}}", [640, 520]);
   
   </script>
   <script src="/media/js/apps/related.js"></script>

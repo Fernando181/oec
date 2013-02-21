@@ -27,8 +27,12 @@ urlpatterns = patterns('',
   
     # API #######################################################################
     (r'^api/(?P<classification>\w{3,6})/(?P<trade_flow>[a-z_]{6,10})/(?P<origin>\w{3})/all/show/(?P<year>[0-9\.]+)/$', 'redesign.views.api_casy'),
-  
-  
+    (r'^api/(?P<classification>\w{3,6})/(?P<trade_flow>[a-z_]{6,10})/show/all/(?P<product>\w{4})/(?P<year>[0-9\.]+)/$', 'redesign.views.api_sapy'),
+    (r'^api/(?P<classification>\w{3,6})/(?P<trade_flow>[a-z_]{6,10})/(?P<origin>\w{3})/show/all/(?P<year>[0-9\.]+)/$', 'redesign.views.api_csay'),
+    (r'^api/(?P<classification>\w{3,6})/(?P<trade_flow>[a-z_]{6,10})/(?P<origin>\w{3})/(?P<destination>\w{3})/show/(?P<year>[0-9\.]+)/$', 'redesign.views.api_ccsy'),
+    (r'^api/(?P<classification>\w{3,6})/(?P<trade_flow>[a-z_]{6,10})/(?P<origin>\w{3})/show/(?P<product>\w{4})/(?P<year>[0-9\.]+)/$', 'redesign.views.api_cspy'),
+    
+    (r'^api/cepii/(?P<origin>\w{3})/show/$', 'redesign.views.api_cepii'),
   
   
     # BLOG ##################################################################

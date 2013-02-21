@@ -12,6 +12,7 @@ import json
 from django.utils.translation import gettext as _
 # App specific
 from observatory.models import *
+from redesign.helpers import get_question
 # Import for cache
 if settings.REDIS:
   from django.core.cache import cache, get_cache
@@ -375,6 +376,9 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
       year = years_available[0]
   
   api_uri = "/api/%s/%s/%s/%s/%s/?%s" % (trade_flow, country1, country2, product, year, options)
+  
+  redesign_api_uri = "/redesign/api/%s/%s/%s/%s/%s/%s" % (prod_class, trade_flow, country1, country2, product, year)
+  
   country_code = None
   if country1 != "show" and country1 != "all": country_code = country1
   
@@ -445,6 +449,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
       title = "Where does %s %s %s %s?" % (countries[0].name, trade_flow, product.name_en, article)
   
   # Return page without visualization data
+  
   return render_to_response("explore/index.html", {
     "warning": warning,
     "alert": alert,
@@ -452,7 +457,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
     "years_available": years_available,
     "data_as_text": data_as_text,
     "app_name": app_name,
-    "title": title,
+    "title": get_question(app_type, trade_flow=trade_flow,origin=countries[0],destination=countries[1],product=product),
     "trade_flow": trade_flow,
     "country1": countries[0] or country1,
     "country2": countries[1] or country2,
@@ -469,6 +474,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
     "year2_list": year2_list,
     "year_interval_list": year_interval_list,
     "api_uri": api_uri,
+    "redesign_api_uri": redesign_api_uri,
     "country_code": country_code,
     "item_type": item_type}, context_instance=RequestContext(request))
 
@@ -544,11 +550,13 @@ def api_casy(request, trade_flow, country1, year):
   else:
     rows = raw_q(query=q, params=None)
     total_val = sum([r[4] for r in rows])
-  
+    
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
     rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
-  
+    
+    raise Exception("Whats my again again?")
+    
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
     
@@ -633,7 +641,7 @@ def api_sapy(request, trade_flow, product, year):
   else:
     rows = raw_q(query=q, params=None)
     total_val = sum([r[4] for r in rows])
-  
+    
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
     rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
