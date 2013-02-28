@@ -149,6 +149,7 @@ function App() {
       })
       .on("mousemove", mouseover)
       .on("mouseout", mouseout)
+			// .on("click", relatedInfo)
   }
   function mouseover(d){
     make_mouseover({

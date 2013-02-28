@@ -533,37 +533,46 @@ def api_cepii(request,origin):
   
   ## Return to browser as JSON for AJAX request ##
   return HttpResponse(json.dumps(json_response))      
-  
+
 def predict(request, country):
   ## Country
-  origin = get_country(origin)
+  origin = get_country(country)
   if origin is None:
     raise Exception("Country Does not Exist.")
-  
-  
+
   ### Present
-  cepiis_present_list = Hs4_Cepii.objects.filter(iso=country,present=1)
-  #cepiis_present = ['{percent:.2%}'.format(percent=float(elem.m_resid)) for elem in cepiis_present_list]
+  present = list(Hs4_Cepii.objects.filter(iso=country,present=1).order_by('-m_resid'))
   
-  remain_present = []
-  disappear = []
-  for item in cepiis_present_list:
-    if math.fabs(item.m_resid) >= 0.5:
-      disappear.append(item)
-    else:
-      remain_present.append(item)
+  disappear = [{"product":e.product,"abbr":e.iso,"hs4":e.hs4,
+              "m_resid":e.m_resid} for e in present[:10]]
+  
+  remain_present = [{"product":e.product,"abbr":e.iso,"hs4":e.hs4,
+              "m_resid":e.m_resid} for e in present[-10:]]
+  
   
   ### Absent
-  cepiis_absent_list = Hs4_Cepii.objects.filter(iso=country,absent=1)
-  appear = []
-  remain_absent = []
-  for item in cepiis_absent_list:
-    if math.fabs(item.m_resid) >= 0.5:
-      appear.append(item)
-    else:
-      remain_absent.append(item)  
-      
-      
-  return render_to_response("redesign/predict.html",{'country':c, 'cepii_present':cepiis_present_list,'cepii_absent':cepiis_absent_list,'disappear':disappear,'remain_present':remain_present, 'appear':appear, 'remain_absent':remain_absent}, context_instance=RequestContext(request))    
+  absent = list(Hs4_Cepii.objects.filter(iso=country,absent=1).order_by('m_resid'))
+  
+  appear = [{"product":e.product,"abbr":e.iso,"hs4":e.hs4,
+              "m_resid":e.m_resid} for e in absent[:10]]
+  
+  remain_absent = [{"product":e.product,"abbr":e.iso,"hs4":e.hs4,
+              "m_resid":e.m_resid} for e in absent[-10:]]
+              
+  everybody = []
+  
+  for i in appear[:5]: everybody.append(i)
+  for i in remain_absent[-5:]: everybody.append(i)
+  for i in disappear[:5]: everybody.append(i)
+  for i in remain_present[-5:]: everybody.append(i)
+              
+              
+  json_response = {}
+  json_response["disappear"] = disappear
+  json_response["appear"] = appear
+  json_response["remain_present"] = remain_present
+  json_response["remain_absent"] = remain_absent    
+                  
+  return render_to_response("redesign/predict.html",{'country':origin, 'cepii_present':present,'cepii_absent':absent,"datu":json.dumps(json_response), "every":json.dumps(everybody)}, context_instance=RequestContext(request))    
   
   

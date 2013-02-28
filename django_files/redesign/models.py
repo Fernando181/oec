@@ -271,9 +271,12 @@ class Hs4_Cepii(models.Model):
     
     def __unicode__(self):
       return self.iso + self.product
-    
+
+
     class Meta:
         db_table = u'redesign_hs4_cepii'
+        
+        
 
 
 ###############################################################################

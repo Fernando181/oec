@@ -9,6 +9,7 @@
 
     <!-- Le styles -->
     <link href="/media/js/libs/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -17,15 +18,83 @@
       .sidebar-nav {
         padding: 9px 0;
       }
+			.svg {
+				font: 10px sans-serif;
+			}
+
+			.bar rect {
+			  fill: steelblue;
+			}
+
+			.bar:hover rect {
+			  fill: brown;
+			}
+
+			.value {
+			  fill: black;
+			}
+
+			.axis {
+			  shape-rendering: crispEdges;
+			}
+
+			.axis path {
+			  stroke: none;
+			}
+
+			.x.axis line {
+			  stroke: #fff;
+			  stroke-opacity: .8;
+			}
+
+			.y.axis path {
+			  stroke: black;
+			}
 			
     </style>
     <link href="/media/js/libs/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-		
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+		<style>
 
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+
+		.bar {
+		  fill: steelblue;
+		}
+
+		.x.axis path {
+		  display: none;
+		}
+
+		</style>
+		
+		<style>
+		.fig.positive {
+		  fill: steelblue;
+		}
+
+		.fig.negative {
+		  fill: brown;
+		}
+
+		.axis text {
+		  font: 10px sans-serif;
+		}
+
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+		
+		</style>
+		<body>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
   <body>
 
@@ -50,69 +119,73 @@
 			</div>		 <!--/.nav-collapse  -->
 		</div>	
 
-   
-		<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
-<div class="row-fluid">
-
-	<div class="span12">	
-		<div class="span3 offset3">
-			<p class="lead">
-				Present
-			</p>
-			<table class="table table-bordered table-condensed" id="present">
-				<thead>
-					<tr>
-					  <th>
-					 	  <small>Product</small>
-					  </th>
-					  <th data-sort="float">
-						  <small>M_resid </small><i class="icon-cog"></i>
-				  	</th>
-					</tr>
-				</thead>	
-				{% for cepii in cepii_present %} 
-				<tr class="info">
-					<td>
-						<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
-					</td>
-					<td>
-						<em>{{cepii.m_resid}}</em>
-					</td>	
-				</tr>
-				{% endfor %}
-			</table>
+		<div class="row">
+			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
+			<p class="pagination-centered" id="neg">
 		</div>
-		<div class="span3 offset0">
-			<p class="lead">
-				Absent
-			</p>
-			<table class="table table-bordered table-condensed" id="absent">
-				<thead>
-					<tr>
-					  <th>
-					 	  <small>Product</small>
-					  </th>
-					  <th data-sort="float">
-						  <small>M_resid </small><i class="icon-cog"></i>
-				  	</th>
-					</tr>
-				</thead>				
-				{% for cepii in cepii_absent %} 
-				<tr class="error">
-					<td>
-						<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
-					</td>
-					<td>
-						<em>{{cepii.m_resid}}</em>
-					</td>	
-				</tr>
-				{% endfor %}
-			</table>
-		</div><!--/span-->
-		
-	</div>
+		<div class="row">
+			<p class="pagination-centered"id="chart">
+			<p class="pagination-centered"id="menu"><b>What seems likely to </b>: <select></select>
+		</div>
+			
+		<div class="row-fluid">
+			<div class="span12">	
+				<div class="span3 offset3">
+					<p class="lead">
+						Present
+					</p>
+					<table class="table table-bordered table-condensed" id="present">
+						<thead>
+							<tr>
+							  <th>
+							 	  <small>Product</small>
+							  </th>
+							  <th data-sort="float">
+								  <small>M_resid </small><i class="icon-cog"></i>
+						  	</th>
+							</tr>
+						</thead>	
+						{% for cepii in cepii_present %} 
+						<tr class="info">
+							<td>
+								<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
+							</td>
+							<td>
+								<em>{{cepii.m_resid}}</em>
+							</td>	
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+				<div class="span3 offset0">
+					<p class="lead">
+						Absent
+					</p>
+					<table class="table table-bordered table-condensed" id="absent">
+						<thead>
+							<tr>
+							  <th>
+							 	  <small>Product</small>
+							  </th>
+							  <th data-sort="float">
+								  <small>M_resid </small><i class="icon-cog"></i>
+						  	</th>
+							</tr>
+						</thead>				
+						{% for cepii in cepii_absent %} 
+						<tr class="error">
+							<td>
+								<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
+							</td>
+							<td>
+								<em>{{cepii.m_resid}}</em>
+							</td>	
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
 
-</div>
+		</div>
 
 			
 				</div><!--/row-->
@@ -120,7 +193,7 @@
       <hr>
 
       <footer>
-        <p>&copy; MIT Media Lab / Harvard Kennedy School Center for International Development </p>
+        <p class="pagination-centered"> MIT Media Lab / Harvard Kennedy School Center for International Development </p>
       </footer>
 
     </div><!--/.fluid-container-->
@@ -132,10 +205,234 @@
 		<script src="/media/js/libs/chosen/chosen.jquery.min.js" ></script>
 		<script src="/media/js/libs/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/media/js/libs/jquery/stupidtable.js" ></script>
+		<script src="/media/js/libs/d3/highlight.min.js" ></script>
 		<script>
 			  $("#absent").stupidtable();
 				$("#present").stupidtable();
 		</script>
+		<script>
+
+		var margin = {top: 20, right: 40, bottom: 10, left: 40},
+		    width = 960,
+		    height = 250 - margin.top - margin.bottom;
+
+		var format = d3.format(".2f"),
+		    states,
+		    age;
+
+		var x = d3.scale.linear()
+		    .range([0, width]);
+
+		var y = d3.scale.ordinal()
+		    .rangeRoundBands([0, height], .1);
+
+		var xAxis = d3.svg.axis()
+		    .scale(x)
+		    .orient("top")
+		    .tickSize(-height - margin.bottom)
+		    .tickFormat(format);
+
+		var svg = d3.select("#chart").append("svg")
+		    .attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		    .style("margin-left", -margin.left + "px")
+		  .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		svg.append("g")
+		    .attr("class", "x axis");
+
+		svg.append("g")
+		    .attr("class", "y axis")
+		  .append("line")
+		    .attr("class", "domain")
+		    .attr("y2", height)
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Hs4");
+		
+		var menu = d3.select("#menu select")
+		    .on("change", change);
+
+
+	  predictions = {{datu|safe}}
+		
+		var products = d3.keys(predictions).filter(function(key) {
+				    return key;
+				  });
+		menu.selectAll("option")
+		   .data(products)			
+	    .enter().append("option")
+	      .text(function(d) { return d; });
+		
+		menu.property("value", "disappear");
+		
+		redraw();
+
+
+		var altKey;
+
+		d3.select(window)
+		    .on("keydown", function() { altKey = d3.event.altKey; })
+		    .on("keyup", function() { altKey = false; });
+
+		function change() {
+		  clearTimeout(timeout);
+
+		  d3.transition()
+		      .duration(altKey ? 7500 : 750)
+		      .each(redraw);
+		}
+
+		function redraw() {
+		  var arg1 = menu.property("value"),
+			    change = predictions[arg1]
+			 
+			/*var age1 = menu.property("value"),
+		      top = states.sort(function(a, b) { return b[age1] - a[age1]; }).slice(0, 10); */
+			
+		  y.domain(change.map(function(d) { return d.hs4; }));
+
+		  var bar = svg.selectAll(".bar")
+		      .data(change, function(d) { return d.hs4; });
+
+		  var barEnter = bar.enter().insert("g", ".axis")
+		      .attr("class", "bar")
+		      .attr("transform", function(d) { return "translate(0," + (y(d.hs4) + height) + ")"; })
+		      .style("fill-opacity", 0);
+
+		  barEnter.append("rect")
+		      .attr("width", age && function(d) { return x(d.m_resid); })
+		      .attr("height", y.rangeBand());
+
+		  barEnter.append("text")
+		      .attr("class", "label")
+		      .attr("x", -3)
+		      .attr("y", y.rangeBand() / 2)
+		      .attr("dy", ".35em")
+		      .attr("text-anchor", "end")
+		      .text(function(d) { return d.hs4; });
+
+			barEnter.append("svg:title")
+					.text(function(d) { return d.product; });
+
+		  barEnter.append("text")
+		      .attr("class", "value")
+		      .attr("x", age && function(d) { return x(d.m_resid) - 3; })
+		      .attr("y", y.rangeBand() / 2)
+		      .attr("dy", ".35em")
+		      .attr("text-anchor", "end");
+
+		  x.domain([0, change[0].m_resid]);
+
+		  var barUpdate = d3.transition(bar)
+		      .attr("transform", function(d) { return "translate(0," + (d.y0 = y(d.hs4)) + ")"; })
+		      .style("fill-opacity", 1);
+
+		  barUpdate.select("rect")
+		      .attr("width", function(d) { return x(d.m_resid); });
+
+		  barUpdate.select(".value")
+		      .attr("x", function(d) { return x(d.m_resid) - 3; })
+		      .text(function(d) { return d.product; });
+
+		  var barExit = d3.transition(bar.exit())
+		      .attr("transform", function(d) { return "translate(0," + (d.y0 + height) + ")"; })
+		      .style("fill-opacity", 0)
+		      .remove();
+
+		  barExit.select("rect")
+		      .attr("width", function(d) { return x(d.m_resid); });
+
+		  barExit.select(".value")
+		      .attr("x", function(d) { return x(d.m_resid) - 3; })
+		      .text(function(d) { return format(d.m_resid); });
+
+		  d3.transition(svg).select(".x.axis")
+		      .call(xAxis);
+		}
+
+		var timeout = setTimeout(function() {
+		   // menu.property("value", "appear").node().focus();
+		   // change();
+		}, 5000);
+
+		</script>
+		
+		<script>
+		var datu = {{every|safe}}
+		
+		var margin = {top: 20, right: 40, bottom: 10, left: 40},
+		    Nwidth = 960,
+		    Nheight = 450 - margin.top - margin.bottom;
+				
+		// var x0 = Math.max(-d3.min(datu), d3.max(datu));
+		var Nx = d3.scale.linear()
+		    .domain([-1, 1])
+		    .range([0, Nwidth])
+		    .nice();
+		
+		var Ny = d3.scale.ordinal()
+		    .domain(d3.range(datu.length))
+		    .rangeRoundBands([0, Nheight], .1);
+
+		var nXAxis = d3.svg.axis()
+		    .scale(Nx)
+		    .orient("top")
+		    .tickSize(-Nheight - margin.bottom)
+		    .tickFormat(format);
+		
+		var neg = d3.select("#neg").append("svg")
+		    .attr("width", Nwidth + margin.left + margin.right)
+		    .attr("height", Nheight + margin.top + margin.bottom)
+		  .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+		neg.selectAll(".fig")
+		    .data(datu)
+		  .enter().append("rect")
+		    .attr("class", function(d) { return d.m_resid < 0 ? "fig negative" : "fig positive"; })
+		    .attr("x", function(d) { return Nx(Math.min(0, d.m_resid)); })
+		    .attr("y", function(d, i) { return Ny(i); })
+		    .attr("width", function(d) { return Math.abs(Nx(d.m_resid) - Nx(0)); })
+		    .attr("height", Ny.rangeBand());
+
+		neg.selectAll("text")
+		   .data(datu)
+		   .enter()
+		   .append("svg:a")
+			 .attr("xlink:href", function(d){
+				 return "/hs4/"+d.hs4;
+			 })
+			 .attr("class", "value")
+			 .append("svg:text")
+		   .text(function(d) {
+					return d.product;
+			})
+	     .attr("x", function(d) { return Nx(Math.min(0, d.m_resid)); })
+	     .attr("y", function(d, i) { return Ny(i); })
+		   .attr("text-anchor", "end")
+			 .attr("dy", "1em"); 		
+
+		neg.append("g")
+		    .attr("class", "x axis")
+		    .call(nXAxis);
+
+		neg.append("g")
+		    .attr("class", "y axis")
+		  .append("line")
+		    .attr("x1", Nx(0))
+		    .attr("x2", Nx(0))
+		    .attr("y1", 0)
+		    .attr("y2", Nheight);
+	
+		</script>
+		
+		
+		
 
   </body>
 </html>
