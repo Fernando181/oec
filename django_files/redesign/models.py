@@ -81,6 +81,7 @@ class Country_Cy(models.Model):
   eci_rank = models.PositiveSmallIntegerField(max_length=4)
   oppvalue = models.FloatField(null=True)
   leader = models.CharField(max_length=100, null=True)
+  magic = models.FloatField(null=True)
   
   def __unicode__(self):
     return "%s rank: %d" % (self.country.name, self.eci_rank)

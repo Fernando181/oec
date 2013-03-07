@@ -119,6 +119,7 @@ def set_product_classification(request, prod_class):
   if prod_class:
     if hasattr(request, 'session'):
       request.session['product_classification'] = prod_class
+      request.session['classification'] = prod_class
   return response
 
 def download(request):

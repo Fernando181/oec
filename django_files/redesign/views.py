@@ -66,6 +66,8 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
 
 
 def api_casy(request, classification, trade_flow, origin, year):
+  
+  #raise Exception ("Did we get to this API?")
   lang = "en"
   total_val={}
   #  Sanity Checks
@@ -76,8 +78,16 @@ def api_casy(request, classification, trade_flow, origin, year):
     raise Exception("Country Does not Exist.")
   
   ## Year
-  years_available = get_years(classification)
- 
+  years_available = sorted(get_years(classification))
+  
+  # Magic numbers for per-capita figures
+  magic = Country_Cy.objects.filter(country=origin.id,
+                                year__range=(years_available[0],
+                                             years_available[-1])).values('year',
+                                                                          'magic')
+  m = {}
+  for i in magic: m[i['year']] = i['magic']
+  
   ## Clasification & Django Data Call
   if classification == "sitc4":
     raw = Sitc4_cpy.objects.filter(country=origin.id)
@@ -146,6 +156,7 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response["title"] = get_question("casy", trade_flow=trade_flow,origin=origin)
   #"What does %s %s?" % (origin.name, trade_flow.replace("_", " "))
   json_response["year"] = year
+  json_response["magic"] = m
   json_response["item_type"] = "product"
   json_response["other"] = query_params
   
@@ -164,7 +175,7 @@ def api_sapy(request, classification, trade_flow, product, year):
   
   ## Year
   years_available = get_years(classification)
-  
+
   ## Clasification & Django Data Call
   if classification == "sitc4":
     raw = Sitc4_cpy.objects.filter(product=product.id)
@@ -429,7 +440,7 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
   
   ## Year
   years_available = get_years(classification)
- 
+    
   ## Clasification & Django Data Call
   if classification == "sitc4":
     raw = Sitc4_ccpy.objects.filter(origin=origin.id).filter(product=product.id)
@@ -437,6 +448,8 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
     raw = Hs4_ccpy.objects.filter(origin=origin.id).filter(product=product.id)
   else:
     raise Exception("Dataset not supported.")
+  
+  
   
   # Article of speech
   article = "to" if trade_flow == "export" else "from"

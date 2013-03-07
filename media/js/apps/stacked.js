@@ -11,6 +11,7 @@ function App() {
     attr_data,
     data,
     svg,
+		capita="total",
     viz;
 
   function stacked(selection) {
@@ -25,17 +26,51 @@ function App() {
       
       attr_data = data.attr_data;
       
+			magic = data.magic;
+			
       years = year.split(".").map(function(y){ return parseInt(y); });
       years = d3.range(years[0], years[1]+1, years[2]);
       
-      // trim data to current year and make sure we have attribute data
+			//trim data to current year and make sure we have attribute data
       current_years_data = data.data.filter(function(d){
         return years.indexOf(d.year) > -1 && attr_data[d.item_id];
       })
-      
-      var year_totals = d3.nest().key(function(d){return d.year}).rollup(function(leaves){return d3.sum(leaves, function(d){return d.value;})}).entries(current_years_data)
-      data_max = layout == "value" ? d3.max(year_totals, function(d){ return d.values; }) : 1;
-      var nested_data = nest_data(years, current_years_data)
+			
+			if (current_years_data[0].capita == undefined){
+				
+				current_years_data.map(function(d){
+					d.original = d.value;
+				})
+				
+				current_years_data.map(function(d){
+					d.capita = parseFloat(d.value * magic[d.year]);
+				})
+				
+			}
+			
+			if (capita=="per"){
+				current_years_data.map(function(d){
+					d.value = d.capita
+				})
+				// current_years_data.map(function(d){
+// 					d.capita = parseFloat(d.value * magic[d.year]);
+// 				})
+			}
+			if (capita=="total"){
+				current_years_data.map(function(d){
+					d.value = d.original; 
+				})
+			}
+			
+      var year_totals = d3.nest().key(function(d){return d.year}).rollup(function(leaves){return d3.sum(leaves, function(d){return d.value;})}).entries(current_years_data); 
+			                            
+		
+			data_max = layout == "value" ? d3.max(year_totals, function(d){ return d.values; }) : 1;
+			
+			var nested_data = nest_data(years, current_years_data)
+			console.log(nested_data);
+			// Using magic numbers to find per capita value 
+			//var capita_nested_data = capita_nest(years, current_years_data)
       
       // Select the svg element, if it exists.
       var svg = d3.select(this).selectAll("svg").data([data]);
@@ -62,11 +97,11 @@ function App() {
           .domain([years[0],years[years.length-1]])
           .range([0, chart.width])
 
-      var y_scale = d3.scale.linear()
-          .domain([0, data_max])
+			var y_scale = d3.scale.linear()
+			    .domain([0, data_max])
           .range([chart.height, 0])
       
-      var x_axis = d3.svg.axis()
+			var x_axis = d3.svg.axis()
         .scale(x_scale)
         .ticks(years.length)
         .tickSize(0)
@@ -153,17 +188,19 @@ function App() {
         .x(function(d) { return x_scale(d.year); })
         .y0(function(d) { return y_scale(d.y0); })
         .y1(function(d) { return y_scale(d.y0 + d.y); })
-      
+					
+				      
       /////////////////////////////////////////////////
       // Enter
       //////////////////////////////////////////////////
-      var layers = stack(nested_data)
+      //var layers = stack(nested_data)
+			var layers = stack(nested_data)
       var paths = d3.select(".viz").selectAll(".layer")
           .data(layers, function(d){ return d.key; })
       
       var height_scale = d3.scale.linear()
         .domain([0, data_max])
-        .range([0, 1])
+				.range([0, 1])
       
       var text_layers = layers.filter(function(d){
         var a = d3.max(d.values.leaves, function(dd){ return height_scale(dd.y); });
@@ -279,7 +316,7 @@ function App() {
         return {
           "years": leaves.length, 
           "val": d3.sum(leaves, function(d) {return parseFloat(d.value);}),
-          "community": attr_data[leaves[0].item_id].category_id,
+         	"community": attr_data[leaves[0].item_id].category_id,
           "name": attr_data[leaves[0].item_id].name,
           "leaves": leaves.sort(function(a,b){return a.year-b.year;})
         } 
@@ -291,7 +328,7 @@ function App() {
       return 0;
     });
   }
-  
+	
   ////////////////////////////////////////////
   // PUBLIC getter / setter functions
   ////////////////////////////////////////////
@@ -336,7 +373,12 @@ function App() {
     order = value;
     return stacked;
   };
-  
+	
+  stacked.capita = function(value) {
+    if (!arguments.length) return capita;
+    capita = value;
+    return stacked;
+  };
   /////////////////////////////////////////////////////////////////////
   // BE SURE TO ALWAYS RETURN THE APP TO ALLOW FOR METHOD CHAINING
   ///////////////////////////////////////////////////////////////////// 

@@ -18,7 +18,7 @@ function build_app(api_uri, type_of_app, dimensions, embed){
     // clean up attribute data
     data.attr_data = clean_attr_data(data.attr_data)
     var showing = data.item_type;
-    
+   
     // initialize the app (build it for the first time)
     app = App()
       .width(dimensions[0])

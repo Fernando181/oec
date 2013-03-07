@@ -16,7 +16,7 @@ function Timeline() {
       if(app_type == "stacked"){
         slider_year = [year.split(".")[0], year.split(".")[1]]
         var slider_interval = [year.split(".")[2]]
-        $("#timeline .slider#year").slider({
+				$("#timeline .slider#year").slider({
           range: true, 
           values: slider_year,
           min: parseInt(years[0]),
@@ -37,9 +37,9 @@ function Timeline() {
           d3.select("#dataviz").call(app.year(current_years.join(".")));
           d3.select("#tool_pane").call(controls.year(current_years.join(".")));
         })
-        $("#timeline .slider#year").bind("slide", function(event, ui) {
+				$("#timeline .slider#year").bind("slide", function(event, ui) {
           $("#timeline #stop").click();
-          slider_year = ui.values;
+					slider_year = ui.values;
           if(ui.values[1] - ui.values[0] < 2){
             return false;
           }
@@ -77,6 +77,7 @@ function Timeline() {
         $("#stacked_labels").buttonset();
         $("#stacked_order").buttonset();
         $("#stacked_layout").buttonset();
+				$("#stacked_capita").buttonset();
         $("#stacked_controls input[type='radio']").change(function(e){
           if($(e.target).attr("name") == "labels"){
             d3.select("#dataviz").call(app.labels($(e.target).attr("id")));
@@ -86,6 +87,9 @@ function Timeline() {
           }
           if($(e.target).attr("name") == "order"){
             d3.select("#dataviz").call(app.order($(e.target).attr("id")));
+          }
+          if($(e.target).attr("name") == "capita"){
+            d3.select("#dataviz").call(app.capita($(e.target).attr("id")));
           }
         })
         // Now that we're done loading UI elements show the parent element
