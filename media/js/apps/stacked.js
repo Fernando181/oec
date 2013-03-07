@@ -68,7 +68,7 @@ function App() {
 			data_max = layout == "value" ? d3.max(year_totals, function(d){ return d.values; }) : 1;
 			
 			var nested_data = nest_data(years, current_years_data)
-			console.log(nested_data);
+			
 			// Using magic numbers to find per capita value 
 			//var capita_nested_data = capita_nest(years, current_years_data)
       
