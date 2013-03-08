@@ -650,11 +650,12 @@ text-decoration: none;
 .app #main #content #timeline #stacked_controls {
   display: none;
   margin: auto;
-  width: 515px;
+/*  width: 515px;*/
+  width: 600px;
 }
 .app #main #content #timeline #stacked_controls > div {
   display: inline-block;
-  margin: 0 35px 0 0;
+  margin: 0 25px 0 0;
   vertical-align: top;
 }
 .app #main #content #timeline #stacked_controls > div:last-child {
