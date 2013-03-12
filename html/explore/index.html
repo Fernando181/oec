@@ -267,11 +267,13 @@
               <input type="radio" id="name" name="order" /><label for="name">name</label>
               <input type="radio" id="val" name="order" /><label for="val">value</label>
             </div>
+						{% if app_type == "casy" %}
 						<div id="stacked_capita">
               <p>Adjust:</p>
               <input type="radio" id="total" name="capita" checked="checked" /><label for="total">Total</label>
               <input type="radio" id="per" name="capita" /><label for="per">Per Capita</label>
             </div>
+						{% endif %}
 					</div>
           {% endif %}
         </div>
@@ -536,7 +538,7 @@
     country2 = "{{country2}}",
     product = "{{product}}",
     item_type = "{{item_type}}",
-		redesign_api_uri = "{{redesign_api_uri}}"
+		redesign_api_uri = "{{redesign_api_uri}}",
     prod_class = "{{prod_class}}";
   
   // Use chosen plugin to make dropdowns look fancy

@@ -475,6 +475,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
     "year2_list": year2_list,
     "year_interval_list": year_interval_list,
     "api_uri": api_uri,
+    "app_type": app_type,
     "redesign_api_uri": redesign_api_uri,
     "country_code": country_code,
     "item_type": item_type}, context_instance=RequestContext(request))

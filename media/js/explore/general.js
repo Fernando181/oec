@@ -6,7 +6,8 @@ function build_app(api_uri, type_of_app, dimensions, embed){
   
   // get data from server
   d3.json(api_uri, function(data){
-    // build the app with data from server
+		
+		// build the app with data from server
     build(data, dimensions)
     // hide loading icon
     d3.select("#loader").style("display", "none");

@@ -158,6 +158,7 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response["year"] = year
   json_response["magic"] = m
   json_response["item_type"] = "product"
+  json_response["app_type"] = "casy"
   json_response["other"] = query_params
   
   # Return to browser as JSON for AJAX request
@@ -245,6 +246,7 @@ def api_sapy(request, classification, trade_flow, product, year):
   json_response["class"] =  classification
   json_response["year"] = year
   json_response["item_type"] = "country"
+  json_response["app_type"] = "sapy"
   json_response["other"] = query_params   
   
   # Return to browser as JSON for AJAX request
@@ -329,6 +331,7 @@ def api_csay(request, classification, trade_flow, origin, year):
   json_response["title"] = get_question("csay", trade_flow=trade_flow,origin=origin)#"Where does %s %s %s?" % (origin.name, trade_flow, article)
   json_response["year"] = year
   json_response["item_type"] = "country"
+  json_response["app_type"] = "csay"
   json_response["other"] = query_params
   
   """Return to browser as JSON for AJAX request"""
@@ -418,6 +421,7 @@ def api_ccsy(request, classification, trade_flow, origin, destination, year):
   json_response["class"] =  classification
   json_response["year"] = year
   json_response["item_type"] = "product"
+  json_response["app_type"] = "ccsy"
   json_response["other"] = query_params
   
   """Return to browser as JSON for AJAX request"""
@@ -510,6 +514,7 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
   json_response["class"] =  classification
   json_response["year"] = year
   json_response["item_type"] = "country"
+  json_response["app_type"] = "cspy"
   json_response["other"] = query_params
 
   ## Return to browser as JSON for AJAX request ##

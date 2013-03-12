@@ -24,11 +24,9 @@ function App() {
         y: margin.top
       }
       
-      attr_data = data.attr_data;
+			attr_data = data.attr_data;
       
-			magic = data.magic;
-			
-      years = year.split(".").map(function(y){ return parseInt(y); });
+			years = year.split(".").map(function(y){ return parseInt(y); });
       years = d3.range(years[0], years[1]+1, years[2]);
       
 			//trim data to current year and make sure we have attribute data
@@ -36,31 +34,35 @@ function App() {
         return years.indexOf(d.year) > -1 && attr_data[d.item_id];
       })
 			
-			if (current_years_data[0].capita == undefined){
+			if (data.app_type == "casy") {
 				
-				current_years_data.map(function(d){
-					d.original = d.value;
-				})
-				
-				current_years_data.map(function(d){
-					d.capita = parseFloat(d.value * magic[d.year]);
-				})
-				
-			}
+				magic = data.magic;
 			
-			if (capita=="per"){
-				current_years_data.map(function(d){
-					d.value = d.capita
-				})
-				// current_years_data.map(function(d){
-// 					d.capita = parseFloat(d.value * magic[d.year]);
-// 				})
-			}
+				if (current_years_data[0].capita == undefined){
+				
+					current_years_data.map(function(d){
+						d.original = d.value;
+					})
+				
+					current_years_data.map(function(d){
+						d.capita = parseFloat(d.value * magic[d.year]);
+					})
+				
+				}
+		  
+			 
+	if (capita=="per"){
+				  current_years_data.map(function(d){
+					     d.value = d.capita
+			    	})
+			   }
 			if (capita=="total"){
-				current_years_data.map(function(d){
-					d.value = d.original; 
-				})
-			}
+				  current_years_data.map(function(d){
+					    d.value = d.original; 
+				    })
+			   }
+			
+		  } 
 			
       var year_totals = d3.nest().key(function(d){return d.year}).rollup(function(leaves){return d3.sum(leaves, function(d){return d.value;})}).entries(current_years_data); 
 			                            
