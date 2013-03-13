@@ -552,6 +552,7 @@ def api_cepii(request,origin):
   ## Return to browser as JSON for AJAX request ##
   return HttpResponse(json.dumps(json_response))      
 
+
 def predict(request, country):
   ## Country
   origin = get_country(country)
@@ -583,14 +584,22 @@ def predict(request, country):
   for i in remain_absent[-5:]: everybody.append(i)
   for i in disappear[:5]: everybody.append(i)
   for i in remain_present[-5:]: everybody.append(i)
-              
+  
+  
+  all_products = Hs4_Cepii.objects.filter(iso=country).order_by('-m_hat')
+  mh_p = list(all_products.filter(present=1).values())
+  mh_a = list(all_products.filter(absent=1).values())
               
   json_response = {}
+  
   json_response["disappear"] = disappear
   json_response["appear"] = appear
   json_response["remain_present"] = remain_present
-  json_response["remain_absent"] = remain_absent    
+  json_response["remain_absent"] = remain_absent
+      
                   
-  return render_to_response("redesign/predict.html",{'country':origin, 'cepii_present':present,'cepii_absent':absent,"datu":json.dumps(json_response), "every":json.dumps(everybody)}, context_instance=RequestContext(request))    
+  return render_to_response("redesign/predict.html",{'country':origin, 'cepii_present':present,
+                            'cepii_absent':absent,'datu':json.dumps(json_response), 'every':json.dumps(everybody),
+                            'mh_p': json.dumps(mh_p[:6]), 'mh_a': json.dumps(mh_a[-6:])}, context_instance=RequestContext(request))    
   
   

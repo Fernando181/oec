@@ -269,6 +269,7 @@ class Hs4_Cepii(models.Model):
     densitycs = models.FloatField(null=True, db_column='densityCS', blank=True) # Field name made lowercase.
     contdensityps = models.FloatField(null=True, db_column='contDensityPS', blank=True) # Field name made lowercase.
     contdensitycs = models.FloatField(null=True, db_column='contDensityCS', blank=True) # Field name made lowercase.
+    m_hat = models.FloatField(null=True,db_column='m_hat', blank=True) 
     
     def __unicode__(self):
       return self.iso + self.product

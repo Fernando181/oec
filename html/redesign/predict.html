@@ -15,6 +15,12 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+			
+			hr {
+				border-top:3px solid #eeeeee;
+				border-bottom:3px solid #ffffff;
+			}
+			
       .sidebar-nav {
         padding: 9px 0;
       }
@@ -93,6 +99,25 @@
 		}
 		
 		</style>
+		
+		<style>
+		
+		.chart div {
+		  font: 10px sans-serif;
+		  background-color: steelblue;
+		  text-align: right;
+		  padding: 3px;
+		  margin: 1px;
+		  color: white;
+		}
+		
+		.chart rect {
+		  stroke: white;
+		  fill: steelblue;
+		}
+		
+		</style>
+		
 		<body>
 		<script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
@@ -118,16 +143,16 @@
 				</div>
 			</div>		 <!--/.nav-collapse  -->
 		</div>	
-
 		<div class="row">
 			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
+			<p class="span4 offset2" id="d1">
+			<p class="span4 offset1" id="d2">	
 			<p class="pagination-centered" id="neg">
 		</div>
 		<div class="row">
 			<p class="pagination-centered"id="chart">
 			<p class="pagination-centered"id="menu"><b>What seems likely to </b>: <select></select>
-		</div>
-			
+		</div>			
 		<div class="row-fluid">
 			<div class="span12">	
 				<div class="span3 offset3">
@@ -186,8 +211,6 @@
 				</div>
 
 		</div>
-
-			
 				</div><!--/row-->
 		
       <hr>
@@ -206,6 +229,7 @@
 		<script src="/media/js/libs/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/media/js/libs/jquery/stupidtable.js" ></script>
 		<script src="/media/js/libs/d3/highlight.min.js" ></script>
+		
 		<script>
 			  $("#absent").stupidtable();
 				$("#present").stupidtable();
@@ -430,9 +454,132 @@
 		    .attr("y2", Nheight);
 	
 		</script>
+		<script>
 		
+		mhp = {{mh_p|safe}}
+		mha = {{mh_a|safe}}
+		d_width = 400;
+		d_height = 150;
+		padding = 25;
 		
-		
+		var x = d3.scale.linear()
+		    .domain([0, 1])
+				.nice()
+		    .range([0, d_width - padding]);
+	
+	
+	  var formatPercent = d3.format("%");
+		// CONSTRUCT SVGS
+		// 
+		var design_one = d3.select("#d1").append("svg")
+		    .attr("class", "chart")
+				.attr("width", d_width)
+				.attr("height", d_height)
+				.append("g")
+				    .attr("transform", "translate(10,15)");
 
+		var design_two = d3.select("#d2").append("svg")
+		    .attr("class", "chart")
+				.attr("width", d_width)
+				.attr("height", d_height)
+				.append("g")
+				    .attr("transform", "translate(10,15)");				
+
+		// APPEND RECTANGLE ELEMENTS TO SVGS 
+		// 
+		design_one.selectAll("rect")
+		    .data(mhp)
+		  .enter().append("rect")
+			  .attr("y", function(d, i) { return i * 20; })
+			  .attr("width", function(d) { return x(d.m_hat)})
+			  .attr("height", 20);	
+		
+		design_two.selectAll("rect")
+		    .data(mha)
+		  .enter().append("rect")
+			  .attr("y", function(d, i) { return i * 20; })
+			  .attr("width", function(d) { return x(d.m_hat)})
+			  .attr("height", 20);	
+
+		// APPEND Guidelines
+    //
+		design_one.selectAll("line")
+		    .data(x.ticks(10))
+		  .enter().append("line")
+		    .attr("x1", x)
+		    .attr("x2", x)
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#ccc");		
+		
+		design_two.selectAll("line")
+		    .data(x.ticks(10))
+		  .enter().append("line")
+		    .attr("x1", x)
+		    .attr("x2", x)
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#ccc");	
+		
+		
+		// APPEND labels to bars	
+		design_one.selectAll("text")
+		    .data(mhp)
+		  .enter().append("text")
+		    .attr("x", function(d){ return x(d.m_hat); })
+		    .attr("y",  function(d, i) { return (i * 20)+10;})
+		    .attr("dx", -10) // padding-right
+		    .attr("dy", ".35em") // vertical-align: middle
+		    .attr("text-anchor", "end") // text-align: right
+				.attr("fill","white")
+				.text(function(d){ return d.product; });
+				
+		design_two.selectAll("text")
+		    .data(mha)
+		  .enter().append("text")
+		    .attr("x", function(d){ return x(d.m_hat); })
+		    .attr("y",  function(d, i) { return (i * 20)+10;})
+		    .attr("dx", 0) // padding-right
+		    .attr("dy", ".35em") // vertical-align: middle
+		    .attr("text-anchor", "start") // text-align: right
+				.attr("fill","black")
+		    .text(function(d){ return d.product; });
+
+		// APPEND ticks
+		design_one.selectAll(".rule")
+		    .data(x.ticks(10))
+		  .enter().append("text")
+		    .attr("class", "rule")
+		    .attr("x", x)
+		    .attr("y", 0)
+		    .attr("dy", -3)
+		    .attr("text-anchor", "middle")
+				.attr("font-size", "10px")
+				.text(function(d){ return formatPercent(d); });
+		
+		design_two.selectAll(".rule")
+		    .data(x.ticks(10))
+		  .enter().append("text")
+		    .attr("class", "rule")
+		    .attr("x", x)
+		    .attr("y", 0)
+		    .attr("dy", -3)
+		    .attr("text-anchor", "middle")
+				.attr("font-size", "10px")
+		    .text(function(d){ return formatPercent(d); });
+						
+		design_one.append("line")
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#000");	
+
+		design_two.append("line")
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#000");				
+
+		
+		</script>
+		
   </body>
 </html>
