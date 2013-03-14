@@ -116,6 +116,10 @@
 		  fill: steelblue;
 		}
 		
+		.chart .negative {
+			fill: brown;
+		}
+		
 		</style>
 		
 		<body>
@@ -145,9 +149,16 @@
 		</div>	
 		<div class="row">
 			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
-			<p class="span4 offset2" id="d1">
-			<p class="span4 offset1" id="d2">	
-			<p class="pagination-centered" id="neg">
+			
+			<p class="pagination-centered">"Present"</p>
+			<p class="pagination-centered" id="d1"></p>
+			<p class="pagination-centered" id="d2"></p>
+			<p class="pagination-centered">"Absent"</p>
+			<p class="pagination-centered" id="d3"></p>	
+			<p class="pagination-centered" id="d4"></p>	
+			
+			<p class="pagination-centered" id="neg"></p>
+		
 		</div>
 		<div class="row">
 			<p class="pagination-centered"id="chart">
@@ -456,9 +467,13 @@
 		</script>
 		<script>
 		
-		mhp = {{mh_p|safe}}
-		mha = {{mh_a|safe}}
-		d_width = 400;
+		mhph = {{mh_ph|safe}}
+		mhpl = {{mh_pl|safe}}
+		mhah = {{mh_ah|safe}}
+		mhal = {{mh_al|safe}}
+		rcas = {{rcas|safe}}
+		
+		d_width = 700;
 		d_height = 150;
 		padding = 25;
 		
@@ -483,23 +498,52 @@
 				.attr("width", d_width)
 				.attr("height", d_height)
 				.append("g")
-				    .attr("transform", "translate(10,15)");				
+				    .attr("transform", "translate(10,15)");
+		
+		var design_three = d3.select("#d3").append("svg")
+		    .attr("class", "chart")
+				.attr("width", d_width)
+				.attr("height", d_height)
+				.append("g")
+				    .attr("transform", "translate(10,15)");									
 
+		var design_four = d3.select("#d4").append("svg")
+		    .attr("class", "chart")
+				.attr("width", d_width)
+				.attr("height", d_height)
+				.append("g")
+				    .attr("transform", "translate(10,15)");		
 		// APPEND RECTANGLE ELEMENTS TO SVGS 
 		// 
 		design_one.selectAll("rect")
-		    .data(mhp)
+		    .data(mhph)
 		  .enter().append("rect")
 			  .attr("y", function(d, i) { return i * 20; })
 			  .attr("width", function(d) { return x(d.m_hat)})
 			  .attr("height", 20);	
 		
 		design_two.selectAll("rect")
-		    .data(mha)
+		    .data(mhpl)
 		  .enter().append("rect")
 			  .attr("y", function(d, i) { return i * 20; })
 			  .attr("width", function(d) { return x(d.m_hat)})
 			  .attr("height", 20);	
+
+		design_three.selectAll("rect")
+		    .data(mhah)
+		  .enter().append("rect")
+			  .attr("y", function(d, i) { return i * 20; })
+			  .attr("width", function(d) { return x(d.m_hat)})
+			  .attr("height", 20)
+				.attr("class", "negative");	
+
+		design_four.selectAll("rect")
+		    .data(mhal)
+		  .enter().append("rect")
+			  .attr("y", function(d, i) { return i * 20; })
+			  .attr("width", function(d) { return x(d.m_hat)})
+			  .attr("height", 20)
+				.attr("class", "negative");		
 
 		// APPEND Guidelines
     //
@@ -520,11 +564,28 @@
 		    .attr("y1", 0)
 		    .attr("y2", 120)
 		    .style("stroke", "#ccc");	
-		
+
+		design_three.selectAll("line")
+		    .data(x.ticks(10))
+		  .enter().append("line")
+		    .attr("x1", x)
+		    .attr("x2", x)
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#ccc");		
+				
+		design_four.selectAll("line")
+		    .data(x.ticks(10))
+		  .enter().append("line")
+		    .attr("x1", x)
+		    .attr("x2", x)
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#ccc");						
 		
 		// APPEND labels to bars	
 		design_one.selectAll("text")
-		    .data(mhp)
+		    .data(mhph)
 		  .enter().append("text")
 		    .attr("x", function(d){ return x(d.m_hat); })
 		    .attr("y",  function(d, i) { return (i * 20)+10;})
@@ -535,7 +596,7 @@
 				.text(function(d){ return d.product; });
 				
 		design_two.selectAll("text")
-		    .data(mha)
+		    .data(mhpl)
 		  .enter().append("text")
 		    .attr("x", function(d){ return x(d.m_hat); })
 		    .attr("y",  function(d, i) { return (i * 20)+10;})
@@ -544,6 +605,28 @@
 		    .attr("text-anchor", "start") // text-align: right
 				.attr("fill","black")
 		    .text(function(d){ return d.product; });
+
+		design_three.selectAll("text")
+		    .data(mhah)
+		  .enter().append("text")
+		    .attr("x", function(d){ return x(d.m_hat); })
+		    .attr("y",  function(d, i) { return (i * 20)+10;})
+		    .attr("dx", -10) // padding-right
+		    .attr("dy", ".35em") // vertical-align: middle
+		    .attr("text-anchor", "end") // text-align: right
+				.attr("fill","white")
+		    .text(function(d){ return d.product; });
+				
+		design_four.selectAll("text")
+		    .data(mhal)
+		  .enter().append("text")
+		    .attr("x", function(d){ return x(d.m_hat); })
+		    .attr("y",  function(d, i) { return (i * 20)+10;})
+		    .attr("dx", 0) // padding-right
+		    .attr("dy", ".35em") // vertical-align: middle
+		    .attr("text-anchor", "start") // text-align: right
+				.attr("fill","black")
+		    .text(function(d){ return d.product; });				
 
 		// APPEND ticks
 		design_one.selectAll(".rule")
@@ -567,6 +650,30 @@
 		    .attr("text-anchor", "middle")
 				.attr("font-size", "10px")
 		    .text(function(d){ return formatPercent(d); });
+			
+		design_three.selectAll(".rule")
+		    .data(x.ticks(10))
+		  .enter().append("text")
+		    .attr("class", "rule")
+		    .attr("x", x)
+		    .attr("y", 0)
+		    .attr("dy", -3)
+		    .attr("text-anchor", "middle")
+				.attr("font-size", "10px")
+		    .text(function(d){ return formatPercent(d); });						
+
+		design_four.selectAll(".rule")
+		    .data(x.ticks(10))
+		  .enter().append("text")
+		    .attr("class", "rule")
+		    .attr("x", x)
+		    .attr("y", 0)
+		    .attr("dy", -3)
+		    .attr("text-anchor", "middle")
+				.attr("font-size", "10px")
+		    .text(function(d){ return formatPercent(d); });	
+
+  //APPEND slight altercations to line
 						
 		design_one.append("line")
 		    .attr("y1", 0)
@@ -578,6 +685,15 @@
 		    .attr("y2", 120)
 		    .style("stroke", "#000");				
 
+		design_three.append("line")
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#000");				
+
+		design_four.append("line")
+		    .attr("y1", 0)
+		    .attr("y2", 120)
+		    .style("stroke", "#000");			
 		
 		</script>
 		

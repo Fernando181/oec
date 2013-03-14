@@ -586,9 +586,16 @@ def predict(request, country):
   for i in remain_present[-5:]: everybody.append(i)
   
   
+  
+  
   all_products = Hs4_Cepii.objects.filter(iso=country).order_by('-m_hat')
+  rcas =  [item.rca for item in all_products.filter(rca__gt=0)]
+  
+  
   mh_p = list(all_products.filter(present=1).values())
   mh_a = list(all_products.filter(absent=1).values())
+  
+  
               
   json_response = {}
   
@@ -600,6 +607,8 @@ def predict(request, country):
                   
   return render_to_response("redesign/predict.html",{'country':origin, 'cepii_present':present,
                             'cepii_absent':absent,'datu':json.dumps(json_response), 'every':json.dumps(everybody),
-                            'mh_p': json.dumps(mh_p[:6]), 'mh_a': json.dumps(mh_a[-6:])}, context_instance=RequestContext(request))    
+                            'mh_ph': json.dumps(mh_p[:6]), 'mh_pl': json.dumps(mh_p[-6:]),
+                            'mh_ah':json.dumps(mh_a[:6]),'mh_al':json.dumps(mh_a[-6:]),
+                            'rcas':json.dumps(rcas)}, context_instance=RequestContext(request))    
   
   
