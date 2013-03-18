@@ -122,6 +122,41 @@
 		
 		</style>
 		
+		<style>
+		.chart {
+
+		}
+
+		.main text {
+		    font: 10px sans-serif;	
+		}
+
+		.axis line, .axis path {
+		    shape-rendering: crispEdges;
+		    stroke: black;
+		    fill: none;
+		}
+
+		circle {
+		    fill: steelblue;
+		}
+
+		div.tooltip {   
+		  position: absolute;           
+		  text-align: center;           
+		  width: auto;                  
+		  height: auto;                 
+		  padding: 2px;             
+		  font: 12px sans-serif; 
+			color: white;       
+		  background: brown;   
+		  border: 2px solid tan;      
+/*		  border-radius: 4px;           */
+		  pointer-events: none;         
+		}
+		
+		</style>
+		
 		<body>
 		<script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
@@ -146,10 +181,12 @@
            </div>
 				</div>
 			</div>		 <!--/.nav-collapse  -->
-		</div>	
+		</div>
 		<div class="row">
 			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
-			
+		
+			<div class='content pagination-centered'>
+			</div>	
 			<p class="pagination-centered">"Present"</p>
 			<p class="pagination-centered" id="d1"></p>
 			<p class="pagination-centered" id="d2"></p>
@@ -245,6 +282,8 @@
 			  $("#absent").stupidtable();
 				$("#present").stupidtable();
 		</script>
+		
+		
 		<script>
 
 		var margin = {top: 20, right: 40, bottom: 10, left: 40},
@@ -695,7 +734,12 @@
 		    .attr("y2", 120)
 		    .style("stroke", "#000");			
 		
+		var all_prod = {{all_prod|safe}}
+		
 		</script>
+		<script type="text/javascript" src="/media/js/libs/d3/scatterplot.js"></script>
+		
+		
 		
   </body>
 </html>

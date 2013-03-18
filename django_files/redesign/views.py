@@ -609,6 +609,6 @@ def predict(request, country):
                             'cepii_absent':absent,'datu':json.dumps(json_response), 'every':json.dumps(everybody),
                             'mh_ph': json.dumps(mh_p[:6]), 'mh_pl': json.dumps(mh_p[-6:]),
                             'mh_ah':json.dumps(mh_a[:6]),'mh_al':json.dumps(mh_a[-6:]),
-                            'rcas':json.dumps(rcas)}, context_instance=RequestContext(request))    
+                            'rcas':json.dumps(rcas), 'all_prod':json.dumps(list(all_products.filter(rca__gt=0).values()))}, context_instance=RequestContext(request))    
   
   
