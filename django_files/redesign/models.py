@@ -251,6 +251,16 @@ class Hs4(models.Model):
 	objects = Hs4_manager()
   
   
+class Hs4_Py(models.Model):
+	id = models.IntegerField(primary_key=True)
+	product = models.ForeignKey(Hs4)
+	year = models.PositiveSmallIntegerField(max_length=4)
+	pci = models.FloatField(null=True)
+	
+
+	def __unicode__(self):
+		return self.product + self.year + self.pci	
+	
 ##########
 # Predictions
 ##########
@@ -439,7 +449,8 @@ class Hs4_cpy(models.Model):
 	export_value = models.FloatField(null=True)
 	import_value = models.FloatField(null=True)
 	export_rca = models.FloatField(null=True)
-	
+	distance = models.FloatField(null=True)  
+		
 	def __unicode__(self):
 		return "CPY: %s.%s.%d" % (self.country.name, self.product.code, self.year)
 	

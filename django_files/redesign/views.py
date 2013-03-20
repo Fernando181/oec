@@ -520,7 +520,31 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
   ## Return to browser as JSON for AJAX request ##
   return HttpResponse(json.dumps(json_response))
 
-
+def api_complex(request,origin,year):
+  origin = get_country(origin)
+  if origin is None:
+    raise Exception("Country Does not Exist.")
+  
+  relation = Hs4_cpy.objects.filter(country=origin.id)
+	complexity = Country_cy.objects.filter(country=origin.id,year=year)
+  # build_response = [{'country':i['country_id'],'product':i['product_id'], 'product_name': i['product_id__']
+# 	                   'year':year, 'export_value':i['export_value'],'import_value':i['import_value'],
+# 										 'export_rca':,'distance':i['distance']} for i in relation.filter(year=year).values('product_id__name')]
+#   
+	
+	
+  build_response = [{'country':i['country_id__name_3char'], 'product_name': i['product_id__name'],
+	                   'year':year, 'distance':i['distance']} for i in relation
+										 																										.filter(year=year)
+																																					.values('product_id__name',
+																																					        'distance',
+																																									'country_id__name_3char'
+																																								 )]
+	
+	
+  return HttpResponse(json.dumps(build_response))
+	
+  
 def api_cepii(request,origin):
   ## Country
   origin = get_country(origin)
