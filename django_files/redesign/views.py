@@ -66,9 +66,9 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
 
 
 def api_casy(request, classification, trade_flow, origin, year):
-  # import time
-#   start = time.time()
-  #raise Exception ("Did we get to this API?")
+  import time
+  start = time.time()
+  from redesign.models import *
   lang = "en"
   total_val={}
   #  Sanity Checks
@@ -89,6 +89,11 @@ def api_casy(request, classification, trade_flow, origin, year):
   m = {}
   for i in magic: m[i['year']] = i['magic']
   
+  attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
+  
   ## Clasification & Django Data Call
   if classification == "sitc4":
     raw = Sitc4_cpy.objects.filter(country=origin.id)
@@ -98,57 +103,164 @@ def api_casy(request, classification, trade_flow, origin, year):
     raise Exception("Dataset not supported.")
     
   ## Trade Flow - defaults to "import" if fail 
+  fast = list(raw.values('year',
+                          'country_id__name_3char',
+                          'product_id',
+                          'product_id__name',
+                          'product_id__name_en',
+                          'product_id__code',
+                          'product_id__community_id',
+                          'product_id__community_id__name',
+                          'product_id__community_id__color',
+                          'distance',
+                          'export_rca',
+                          'export_value',
+                          'import_value'))
   
   #### Net Export
   if trade_flow == "net_export":
+    # fast = list(raw.values('year',
+    #                        'product',
+    #                        'product__code',
+    #                        'product__name_en',
+    #                        'export_value',
+    #                        'import_value',
+    #                        'export_rca'
+    #                        ))
     fast = list(raw.values('year',
-                           'product',
-                           'product__code',
-                           'product__name_en',
-                           'export_value',
-                           'import_value',
-                           'export_rca'
-                           ))
+                            'country_id__name_3char',
+                            'product_id',
+                            'product_id__name',
+                            'product_id__name_en',
+                            'product_id__code',
+                            'product_id__community_id',
+                            'product_id__community_id__name',
+                            'product_id__community_id__color',
+                            'distance',
+                            'export_rca',
+                            'export_value',
+                            'import_value'))                           
     # Remove invalid
     fast = [x for x in fast if x['export_value'] - x['import_value'] > 0]
      # Add net index for convenince  
     for x in fast: 
       x['net'] = x['export_value'] - x['import_value']
-    
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
+      
+    build = [{"year":e['year'],
+              "country":e['country_id__name_3char'],
+              "id":e['product_id'],
+              "name":e['product_id__name_en'], 
+              "code":e['product_id__code'],
+              "community_id":e['product_id__community_id'],
+              "community_name":e['product_id__community_id__name'],
+              "color":e['product_id__community_id__color'],
+              "distance":e['distance'],
+              "value":e['net'],
+              "export_rca":e['export_rca']} for e in fast]    
+    # build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+    #           "name":e['product__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
   
   ####  Net Import
   elif trade_flow == "net_import":
-    fast = list(raw.values('year','product','product__code','product__name_en',
-                  'export_value','import_value','export_rca'))
+    # fast = list(raw.values('year','product','product__code','product__name_en',
+    #               'export_value','import_value','export_rca'))
+    #               
+                  
+    fast = list(raw.values('year',
+                            'country_id__name_3char',
+                            'product_id',
+                            'product_id__name',
+                            'product_id__name_en',
+                            'product_id__code',
+                            'product_id__community_id',
+                            'product_id__community_id__name',
+                            'product_id__community_id__color',
+                            'distance',
+                            'export_rca',
+                            'export_value',
+                            'import_value'))              
     # Remove invalid
     fast = [x for x in fast if x['import_value'] - x['export_value'] > 0]
      # Add net index for convenince  
     for x in fast: 
       x['net'] = x['import_value'] - x['export_value']
     
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
+    build = [{"year":e['year'],
+              "country":e['country_id__name_3char'],
+              "id":e['product_id'],
+              "name":e['product_id__name_en'], 
+              "code":e['product_id__code'],
+              "community_id":e['product_id__community_id'],
+              "community_name":e['product_id__community_id__name'],
+              "color":e['product_id__community_id__color'],
+              "distance":e['distance'],
+              "value":e['net'],
+              "export_rca":e['export_rca']} for e in fast]
+              
+    # build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+#               "name":e['product__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
     
   ####  Export
   elif trade_flow == "export":
     exp = raw.filter(export_value__gt=0)
     
-    fast = raw.values('year','product','product__code','product__name_en',
-                      'export_value','export_rca')
-         
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['export_value'],"rca":e['export_rca']} for e in fast]
+    fast = raw.values('year',
+                      'country_id__name_3char',
+                      'product_id',
+                      'product_id__name',
+                      'product_id__name_en',
+                      'product_id__code',
+                      'product_id__community_id',
+                      'product_id__community_id__name',
+                      'product_id__community_id__color',
+                      'distance',
+                      'export_rca',
+                      'export_value')
+              
+    build = [{"year":e['year'],
+              "country":e['country_id__name_3char'],
+              "id":e['product_id'],
+              "name":e['product_id__name_en'], 
+              "code":e['product_id__code'],
+              "community_id":e['product_id__community_id'],
+              "community_name":e['product_id__community_id__name'],
+              "color":e['product_id__community_id__color'],
+              "distance":e['distance'],
+              "value":e['export_value'],
+              "export_rca":e['export_rca']} for e in fast]
             
   #### Import
   else: 
     exp = raw.filter(import_value__gt=0)
-    fast = exp.values('year','product','product__code','product__name_en',
-                      'import_value','export_rca')
+    # fast = exp.values('year','product','product__code','product__name_en',
+    #                   'import_value','export_rca')
+    fast = raw.values('year',
+                      'country_id__name_3char',
+                      'product_id',
+                      'product_id__name',
+                      'product_id__name_en',
+                      'product_id__code',
+                      'product_id__community_id',
+                      'product_id__community_id__name',
+                      'product_id__community_id__color',
+                      'distance',
+                      'export_rca',
+                      'import_value')
+    
+    build = [{"year":e['year'],
+              "country":e['country_id__name_3char'],
+              "id":e['product_id'],
+              "name":e['product_id__name_en'], 
+              "code":e['product_id__code'],
+              "community_id":e['product_id__community_id'],
+              "community_name":e['product_id__community_id__name'],
+              "color":e['product_id__community_id__color'],
+              "distance":e['distance'],
+              "value":e['import_value'],
+              "export_rca":e['export_rca']} for e in fast]                      
 
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['import_value'],"rca":e['export_rca']} for e in fast]    
+    # build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+#               "name":e['product__name_en'], "value":e['import_value'],"rca":e['export_rca']} for e in fast]    
   
   # Set query params with our changes
   query_params = request.GET.copy()
@@ -158,6 +270,7 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response = {}
   json_response["data"] = build
   json_response["attr_data"] = Sitc4.objects.get_all(lang) if classification == "sitc4" else Hs4.objects.get_all(lang)
+  json_response["attr"] = attr
   json_response["origin"] = origin.to_json()
   json_response["class"] =  classification
   json_response["title"] = get_question("casy", trade_flow=trade_flow,origin=origin)
@@ -168,7 +281,7 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response["app_type"] = "casy"
   json_response["other"] = query_params
   
-  # raise Exception(time.time() - start)
+  raise Exception(time.time() - start)
   # Return to browser as JSON for AJAX request
   return HttpResponse(json.dumps(json_response))   
       
@@ -677,8 +790,6 @@ def api_cepii(request,origin):
 
 
 def predict(request, country):
-  
-  test_string = "testing testing"
   ## Country
   origin = get_country(country)
   if origin is None:
