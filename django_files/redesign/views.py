@@ -677,6 +677,8 @@ def api_cepii(request,origin):
 
 
 def predict(request, country):
+  
+  test_string = "testing testing"
   ## Country
   origin = get_country(country)
   if origin is None:
