@@ -358,7 +358,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   year1_list = range(years_available[0], years_available[len(years_available)-1]+1, 1)
 
   if app_name == "stacked" and year == "2009":
-    year = "1969.2009.10"
+    year = "1969.2010.10"
   if "." in year:
     y = [int(x) for x in year.split(".")]
     # year = range(y[0], y[1]+1, y[2])
@@ -375,6 +375,8 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
       year = years_available[len(years_available)-1]
     elif year < years_available[0]:
       year = years_available[0]
+  
+  
   
   api_uri = "/api/%s/%s/%s/%s/%s/?%s" % (trade_flow, country1, country2, product, year, options)
   
@@ -557,7 +559,6 @@ def api_casy(request, trade_flow, country1, year):
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
     rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
     
-    raise Exception("Whats my again again?")
     
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
@@ -570,7 +571,6 @@ def api_casy(request, trade_flow, country1, year):
   json_response["year"] = year
   json_response["item_type"] = "product"
   json_response["other"] = query_params
-  
   """Return to browser as JSON for AJAX request"""
   return HttpResponse(json.dumps(json_response))
 

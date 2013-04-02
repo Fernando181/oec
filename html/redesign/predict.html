@@ -15,6 +15,10 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+      
+      .tab-pane {
+        min-height:250px;
+      }
 			
 			hr {
 				border-top:3px solid #eeeeee;
@@ -161,7 +165,6 @@
 		<script src="http://d3js.org/d3.v3.min.js"></script>
   </head>
   <body>
-
     <div class="navbar navbar-inverse navbar-fixed-top">
        <div class="row navbar-inner">
          <div class="container">
@@ -170,105 +173,131 @@
              <span class="icon-bar"></span>
              <span class="icon-bar"></span>
            </a>
-          
            <div class="nav-collapse collapse">
-             <ul class="nav">
-               <li class="active"><a href="#">BUILD</a></li>
-							 <li><a href="#">ATLAS</a></li>
-							 <li><a href="#">BLOG</a></li>
-							 <li><a href="#">ABOUT</a></li>
+             <ul class="nav nav-tab">
+               <li class="active"><a href="#build" data-toggle="tab">BUILD</a></li>
+							 <li><a href="#atlas" data-toggle="tab">ATLAS</a></li>
+							 <li><a href="#blog" data-toggle="tab">BLOG</a></li>
+							 <li><a href="#about" data-toggle="tab">ABOUT</a></li>
              </ul>
            </div>
-				</div>
+         </div>
 			</div>		 <!--/.nav-collapse  -->
 		</div>
-		<div class="row">
-			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
 		
-			<div class='content pagination-centered'>
-			</div>	
-			<p class="pagination-centered">"Present"</p>
-			<p class="pagination-centered" id="d1"></p>
-			<p class="pagination-centered" id="d2"></p>
-			<p class="pagination-centered">"Absent"</p>
-			<p class="pagination-centered" id="d3"></p>	
-			<p class="pagination-centered" id="d4"></p>	
-			
-			<p class="pagination-centered" id="neg"></p>
+    
+    
+    <div class="tab-content">
+      
+      <div id="build" class="tab-pane active">
+        <!-- Scatterpot & Static Bar Charts-->
+        <div class="row">
+
+    			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
 		
-		</div>
-		<div class="row">
-			<p class="pagination-centered"id="chart">
-			<p class="pagination-centered"id="menu"><b>What seems likely to </b>: <select></select>
-		</div>			
-		<div class="row-fluid">
-			<div class="span12">	
-				<div class="span3 offset3">
-					<p class="lead">
-						Present
-					</p>
-					<table class="table table-bordered table-condensed" id="present">
-						<thead>
-							<tr>
-							  <th>
-							 	  <small>Product</small>
-							  </th>
-							  <th data-sort="float">
-								  <small>M_resid </small><i class="icon-cog"></i>
-						  	</th>
-							</tr>
-						</thead>	
-						{% for cepii in cepii_present %} 
-						<tr class="info">
-							<td>
-								<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
-							</td>
-							<td>
-								<em>{{cepii.m_resid}}</em>
-							</td>	
-						</tr>
-						{% endfor %}
-					</table>
-				</div>
-				<div class="span3 offset0">
-					<p class="lead">
-						Absent
-					</p>
-					<table class="table table-bordered table-condensed" id="absent">
-						<thead>
-							<tr>
-							  <th>
-							 	  <small>Product</small>
-							  </th>
-							  <th data-sort="float">
-								  <small>M_resid </small><i class="icon-cog"></i>
-						  	</th>
-							</tr>
-						</thead>				
-						{% for cepii in cepii_absent %} 
-						<tr class="error">
-							<td>
-								<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
-							</td>
-							<td>
-								<em>{{cepii.m_resid}}</em>
-							</td>	
-						</tr>
-						{% endfor %}
-					</table>
-				</div>
+    			<div class='content pagination-centered'>
+			  
+    			</div>	
+            <!-- Show only M^ figures -->
+      			<p class="pagination-centered">"Present"</p>
+      			<p class="pagination-centered" id="d1"></p>
+      			<p class="pagination-centered" id="d2"></p>
+      			<p class="pagination-centered">"Absent"</p>
+      			<p class="pagination-centered" id="d3"></p>	
+      			<p class="pagination-centered" id="d4"></p>	
+            <!-- Display Positive and Negitave values    -->
+      			<p class="pagination-centered" id="neg"></p>
+  		  </div>
+        <!-- Adjustable Bar chart -->
+        <div class="row">
+    			<p class="pagination-centered"id="chart">
+    			<p class="pagination-centered"id="menu"><b>What seems likely to </b>: <select></select>
+  		  </div>			
+        <!-- Table -->
+        <div class="row-fluid">
+    			<div class="span12">	
+    				<div class="span3 offset3">
+    					<p class="lead">
+    						Present
+    					</p>
+    					<table class="table table-bordered table-condensed" id="present">
+    						<thead>
+    							<tr>
+    							  <th>
+    							 	  <small>Product</small>
+    							  </th>
+    							  <th data-sort="float">
+    								  <small>M_resid </small><i class="icon-cog"></i>
+    						  	</th>
+    							</tr>
+    						</thead>	
+    						{% for cepii in cepii_present %} 
+    						<tr class="info">
+    							<td>
+    								<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
+    							</td>
+    							<td>
+    								<em>{{cepii.m_resid}}</em>
+    							</td>	
+    						</tr>
+    						{% endfor %}
+    					</table>
+    				</div>
+    				<div class="span3 offset0">
+    					<p class="lead">
+    						Absent
+    					</p>
+    					<table class="table table-bordered table-condensed" id="absent">
+    						<thead>
+    							<tr>
+    							  <th>
+    							 	  <small>Product</small>
+    							  </th>
+    							  <th data-sort="float">
+    								  <small>M_resid </small><i class="icon-cog"></i>
+    						  	</th>
+    							</tr>
+    						</thead>				
+    						{% for cepii in cepii_absent %} 
+    						<tr class="error">
+    							<td>
+    								<a href="/hs4/{{cepii.product}}/">{{ cepii.product }}</a>
+    							</td>
+    							<td>
+    								<em>{{cepii.m_resid}}</em>
+    							</td>	
+    						</tr>
+    						{% endfor %}
+    					</table>
+    				</div>
+      		</div>
+        </div>
+      </div>
+      <div id="atlas" class="tab-pane">
+  		  <p class="pagination-centered">Atlas</p>
+  		</div>
+      <div id="blog" class="tab-pane">
+        <div class="span6 offset3">
+          <p class="pagination-centered">March 15th: Scatterplot visualization added. Instead of displaying the RCA on a log scale, Riccardo has suggested using Frank Neffke's RCA* figure. This is calculated as <br> RCA* = (RCA-1) / (RCA+1) </p>
+          <hr>
+        </div>  
+      </div>
+      <div id="about" class="tab-pane">
+        <div class="span6 offset3">
+        <blockquote>
+          <p class="pagination-centered">The base year of the predictions is 2010; the label for M_hat might be "Predicted export probability" or "Projected export probability." Also, the Country Space is sometimes called the Producer Space.</p>
+          <small>Danny Stock <cite title="Source Title"></cite></small>
+        </blockquote>
+        </div>
+      </div>
+    </div> <!-- tab content -->
+    
+    <footer>
+        <p class="pagination-centered"> © MIT Media Lab / Harvard Kennedy School Center for International Development</p>
+    </footer>
 
-		</div>
-				</div><!--/row-->
-		
-      <hr>
-
-      <footer>
-        <p class="pagination-centered"> MIT Media Lab / Harvard Kennedy School Center for International Development </p>
-      </footer>
-
-    </div><!--/.fluid-container-->
-
+    
+    
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

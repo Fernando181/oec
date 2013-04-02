@@ -33,7 +33,7 @@ urlpatterns = patterns('',
     (r'^api/(?P<classification>\w{3,6})/(?P<trade_flow>[a-z_]{6,10})/(?P<origin>\w{3})/show/(?P<product>\w{4})/(?P<year>[0-9\.]+)/$', 'redesign.views.api_cspy'),
     
     (r'^api/cepii/(?P<origin>\w{3})/show/$', 'redesign.views.api_cepii'),
-  
+    (r'^api/complex/(?P<origin>\w{3})/(?P<year>[0-9\.]+)/$', 'redesign.views.api_complex'),
   
     # BLOG ##################################################################
     (r'^blog/$', "blog.views.blog_index"),
@@ -43,7 +43,11 @@ urlpatterns = patterns('',
     # ABOUT ##################################################################
     
     # Prediction
-    (r'^predict/(?P<country>\w{3,4})/$', "redesign.views.predict")
-    
+    (r'^predict/(?P<country>\w{3,4})/$', "redesign.views.predict"),
+    # VizWiz
+    (r'^tree/(?P<origin>\w{3,4})/(?P<year>[0-9\.]+)/$', "redesign.views.tree"),
+    (r'^stack/(?P<origin>\w{3,4})/(?P<year>[0-9\.]+)/$', "redesign.views.stack"),
+    (r'^scatter/(?P<origin>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.scatter'),
+    (r'^network/(?P<origin>\w{3,4})/(?P<year>[0-9\.]+)/$', 'redesign.views.network')
     
 )

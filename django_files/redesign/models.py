@@ -84,7 +84,7 @@ class Country_Cy(models.Model):
   magic = models.FloatField(null=True)
   
   def __unicode__(self):
-    return "%s rank: %d" % (self.country.name, self.eci_rank)
+    return "%s year: %d" % (self.country.name, self.year)
 
 
 ###############################################################################
@@ -252,14 +252,15 @@ class Hs4(models.Model):
   
   
 class Hs4_Py(models.Model):
-	id = models.IntegerField(primary_key=True)
-	product = models.ForeignKey(Hs4)
-	year = models.PositiveSmallIntegerField(max_length=4)
-	pci = models.FloatField(null=True)
-	
-
-	def __unicode__(self):
-		return self.product + self.year + self.pci	
+  id = models.IntegerField(primary_key=True)
+  product = models.ForeignKey(Hs4)
+  year = models.IntegerField()
+  pci = models.FloatField(null=True, blank=True)
+  pci_rank = models.IntegerField(null=True, blank=True)
+  
+  def __unicode__(self):
+    return "Ranking: "  + str(self.pci_rank)
+  
 	
 ##########
 # Predictions
@@ -449,7 +450,8 @@ class Hs4_cpy(models.Model):
 	export_value = models.FloatField(null=True)
 	import_value = models.FloatField(null=True)
 	export_rca = models.FloatField(null=True)
-	distance = models.FloatField(null=True)  
+	distance = models.FloatField(null=True) 
+	opp_gain = models.FloatField(null=True) 
 		
 	def __unicode__(self):
 		return "CPY: %s.%s.%d" % (self.country.name, self.product.code, self.year)

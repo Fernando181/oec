@@ -66,7 +66,8 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
 
 
 def api_casy(request, classification, trade_flow, origin, year):
-  
+  # import time
+#   start = time.time()
   #raise Exception ("Did we get to this API?")
   lang = "en"
   total_val={}
@@ -81,10 +82,10 @@ def api_casy(request, classification, trade_flow, origin, year):
   years_available = sorted(get_years(classification))
   
   # Magic numbers for per-capita figures
-  magic = Country_Cy.objects.filter(country=origin.id,
-                                year__range=(years_available[0],
-                                             years_available[-1])).values('year',
-                                                                          'magic')
+  magic = list(Country_Cy.objects.filter(country=origin.id).values('year','magic'))
+                                #,year__range=(years_available[0],
+                                #             years_available[-1])).values('year',
+                                #                                          'magic')
   m = {}
   for i in magic: m[i['year']] = i['magic']
   
@@ -100,8 +101,14 @@ def api_casy(request, classification, trade_flow, origin, year):
   
   #### Net Export
   if trade_flow == "net_export":
-    fast = list(raw.values('year','product','product__code','product__name_en',
-                  'export_value','import_value','export_rca'))
+    fast = list(raw.values('year',
+                           'product',
+                           'product__code',
+                           'product__name_en',
+                           'export_value',
+                           'import_value',
+                           'export_rca'
+                           ))
     # Remove invalid
     fast = [x for x in fast if x['export_value'] - x['import_value'] > 0]
      # Add net index for convenince  
@@ -127,13 +134,13 @@ def api_casy(request, classification, trade_flow, origin, year):
   ####  Export
   elif trade_flow == "export":
     exp = raw.filter(export_value__gt=0)
-   
-    fast = exp.values('year','product','product__code','product__name_en',
+    
+    fast = raw.values('year','product','product__code','product__name_en',
                       'export_value','export_rca')
-              
+         
     build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
               "name":e['product__name_en'], "value":e['export_value'],"rca":e['export_rca']} for e in fast]
-              
+            
   #### Import
   else: 
     exp = raw.filter(import_value__gt=0)
@@ -161,6 +168,7 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response["app_type"] = "casy"
   json_response["other"] = query_params
   
+  # raise Exception(time.time() - start)
   # Return to browser as JSON for AJAX request
   return HttpResponse(json.dumps(json_response))   
       
@@ -521,29 +529,120 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
   return HttpResponse(json.dumps(json_response))
 
 def api_complex(request,origin,year):
+  # import time
+  # start = time.time()
+  
+  # If I don't set this things are defaulting to the original db. But this Module calls redesign at the top?
+  from redesign.models import *
+  
   origin = get_country(origin)
   if origin is None:
     raise Exception("Country Does not Exist.")
   
-  relation = Hs4_cpy.objects.filter(country=origin.id)
-	complexity = Country_cy.objects.filter(country=origin.id,year=year)
-  # build_response = [{'country':i['country_id'],'product':i['product_id'], 'product_name': i['product_id__']
-# 	                   'year':year, 'export_value':i['export_value'],'import_value':i['import_value'],
-# 										 'export_rca':,'distance':i['distance']} for i in relation.filter(year=year).values('product_id__name')]
-#   
-	
-	
-  build_response = [{'country':i['country_id__name_3char'], 'product_name': i['product_id__name'],
-	                   'year':year, 'distance':i['distance']} for i in relation
-										 																										.filter(year=year)
-																																					.values('product_id__name',
-																																					        'distance',
-																																									'country_id__name_3char'
-																																								 )]
-	
-	
-  return HttpResponse(json.dumps(build_response))
-	
+  relation = Hs4_cpy.objects.filter(country=origin.id)  
+  attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
+  
+  # years = year.split('.')
+  # if len(years) < 2:
+  #   years.append(years[0])
+  
+  comp_list = list(Hs4_Py.objects.values())
+  complexity = {}
+  for i in comp_list: 
+    complexity[i['product_id']] = i
+  #import time
+  #start = time.time()
+  build_response = [{'country':i['country_id__name_3char'], 
+                     'name': i['product_id__name_en'],
+                     'color': i['product_id__community_id__color'],
+                     'community': i['product_id__community_id'],
+                     'community_name':i['product_id__community_id__name'],
+                     # 'nesting_0': {'id':str(i['product_id__community_id']),
+                      #              'name':i['product_id__community_id__name']},
+                     # 'nesting_1': {'id': str(i['product_id__code'])[:2],
+                      #              'name': attr.get(code=str(i['product_id__code'])[:2]).name },
+                     # 'nesting_2': {'id': str(i['product_id']),
+                     #               'name': i['product_id__name_en']},
+										 'id': i['product_id'],
+                     'code': i['product_id__code'],       
+                     #'complexity': Hs4_Py.objects.get(year=i['year'],product=i['product_id']).pci,
+	                   'year':i['year'], 
+										 'value':i['export_value'],
+										 'val_usd': i['export_value'],
+                     'rca':i['export_rca'],
+                     'distance':i['distance']} for i in relation
+					 																										#.filter(year__range=(years[0],years[1]))
+																																.values('country_id__name_3char',
+                                                                        'product_id',
+                                                                        'product_id__name', 
+                                                                        'product_id__name_en',
+                                                                        'product_id__code',
+                                                                        'product_id__community_id',
+                                                                        'product_id__community_id__name',
+                                                                        'product_id__community_id__color',
+                                                                        'distance',
+                                                                        'export_rca',
+                                                                        'export_value',
+                                                                        'year'
+                                                                       )]
+
+  # raise Exception(time.time() - start)
+  return HttpResponse(json.dumps({"data":build_response,"attr":attr, "complex":complexity}))
+
+def tree(request,origin,year):
+  origin = get_country(origin)
+  if origin is None:
+    raise Exception("Country Does not Exist.")
+  
+  # Return page without visualization data
+  return render_to_response("tree_local.html", {
+     "origin": origin,
+     "year":year
+    }, context_instance=RequestContext(request))
+
+def stack(request,origin,year,classification="hs4"):
+  origin = get_country(origin)
+  if origin is None:
+    raise Exception("Country Does not Exist.")
+  
+  years = year.split('.')  
+  year_start = years[0]
+  year_end = years[1]
+  
+  # Return page without visualization data
+  return render_to_response("stack_local.html", {
+     "origin": origin,
+     "year":year,
+     "year_start": year_start,
+     "year_end": year_end
+    }, context_instance=RequestContext(request))
+   
+    
+def scatter(request,origin,year):
+  origin = get_country(origin)
+  if origin is None:
+    raise Exception("Country Does not Exist.")
+     
+  # Return page without visualization data
+  return render_to_response("scatter_local.html", {
+     "origin": origin,
+     "year":year
+    }, context_instance=RequestContext(request))
+def network(request,origin,year):
+  origin = get_country(origin)
+  if origin is None:
+    raise Exception("Country Does not Exist.")
+     
+  # Return page without visualization data
+  return render_to_response("network_local.html", {
+     "origin": origin,
+     "year":year
+    }, context_instance=RequestContext(request))    
+    
+    
   
 def api_cepii(request,origin):
   ## Country
