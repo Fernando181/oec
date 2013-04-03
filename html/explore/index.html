@@ -526,7 +526,8 @@
   
   // variables from server
   var app,
-    app_types = ["tree_map", "stacked", "product_space", "", "map"]
+    app_types = ["tree_map", "stacked", "product_space", "", "map"],
+    app_type ="{{app_type}}",
     warning = "{{warning}}",
     is_alert = "{{alert}}",
     api_uri = "{{api_uri}}",
@@ -603,7 +604,36 @@
     
     flat_data = flat_data.filter(function(d){ return d.year == year; })
     
-    flat_data.map(function(d,i){
+    where = []
+    if (app_type == "casy" || app_type == "sapy" || app_type == "ccsy"){
+      flat_data.forEach(function(d){ 
+        if (trade_flow=="net_export"){
+            val = d.export_value - d.import_value;
+            if (val > 0 ){ 
+              d.value = d.export_value - d.import_value;
+              where.push(d);
+            }
+          } else if (trade_flow=="net_import") {
+             val = d.import_value - d.export_value;
+             if (val > 0 ){ 
+               d.value = d.import_value - d.export_value;
+               where.push(d);
+              }        
+          } else if (trade_flow=="export"){
+            if (d.export_value > 0){
+              d.value = d.export_value;
+              where.push(d);
+            }
+          } else {
+            if (d.import_value > 0){
+              d.value = d.import_value;
+              where.push(d);
+            }
+          }
+      })
+    } 
+
+    where.map(function(d,i){
       
       d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
       d.nesting_1 = {"name":attr[d.code.slice(0, 2)].name,"id":d.code.slice(0, 2)};
@@ -611,7 +641,7 @@
        
     })
     
-    var nested_raw = vizwhiz.utils.nest(flat_data, ["nesting_0"], false, [{"key":"color"}])
+    var nested_raw = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"}])
     console.log(nested_raw);
     
     //raw.map(function())
