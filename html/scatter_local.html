@@ -484,7 +484,7 @@ d3.json("/redesign/api/complex/{{origin.name_3char}}/{{year}}", function(raw){
     
   })
  
-  var nested = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1"], true,
+  var nested = vizwhiz.utils.nest(flat_data, ["nesting_0"], true,
       [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
 
   
@@ -523,7 +523,7 @@ d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(flat_da
     })
     
     // nest the flat data by nesting array
-    var nested2010 = vizwhiz.utils.nest(data2010, ["nesting_0"], true,
+    var nested2010 = vizwhiz.utils.nest(data2010, ["nesting_0","nesting_1"], true,
         [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
 
     data2003 = flat_data.filter(function(d){

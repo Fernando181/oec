@@ -66,8 +66,6 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
 
 
 def api_casy(request, classification, trade_flow, origin, year):
-  import time
-  start = time.time()
   from redesign.models import *
   lang = "en"
   total_val={}
@@ -294,11 +292,11 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response["app_type"] = "casy"
   json_response["other"] = query_params
   
-  # raise Exception(time.time() - start)
   # Return to browser as JSON for AJAX request
   return HttpResponse(json.dumps(json_response))   
       
 def api_sapy(request, classification, trade_flow, product, year):
+  from redesign.models import *
   lang = "en"
   total_val = {}
   #  Sanity Checks
@@ -318,13 +316,19 @@ def api_sapy(request, classification, trade_flow, product, year):
     raw = Hs4_cpy.objects.filter(product=product.id)
   else:
     raise Exception("Dataset not supported.")
+  
+  attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
    
   ## Trade Flow - defaults to "import" if fail 
   fast = list(raw.values('year',
                          'country_id__name_3char',
                          'country_id__name_en',
                          'country_id__region_id',
-                         'country_id__region_id__name'
+                         'country_id__region_id__name',
+                         'country_id__region_id__color',
                          'country_id',
                          'distance',
                          'export_rca',
@@ -335,9 +339,8 @@ def api_sapy(request, classification, trade_flow, product, year):
             "country":e['country_id__name_3char'],
             "id":e['country_id'],
             "name":e['country_id__name_en'], 
-            "code":e['product_id__code'],
             "region_id":e['country_id__region_id'],
-            "region_name":e['region_id__region_id__name'],
+            "region_name":e['country_id__region_id__name'],
             "color":e['country_id__region_id__color'],
             "distance":e['distance'],
             "export_value":e['export_value'],
@@ -399,6 +402,7 @@ def api_sapy(request, classification, trade_flow, product, year):
   json_response = {}
   json_response["data"] = build            
   json_response["attr_data"] = Country.objects.get_all(lang)
+  json_response["attr"] = attr
   json_response["product"] = product.to_json()
   json_response["title"] = get_question("sapy", trade_flow=trade_flow,product=product)#"Who %ss %s?" % (trade_flow.replace("_", " "), product.name_en)
   json_response["class"] =  classification
@@ -426,13 +430,49 @@ def api_csay(request, classification, trade_flow, origin, year):
   
   ## Clasification & Django Data Call
   if classification == "sitc4":
-    raw = Sitc4_ccpy.objects.filter(origin=origin.id)
+    raw = Sitc4_ccpy.objects.filter(origin=origin.id,year=year)
   elif classification == "hs4":
-    raw = Hs4_ccpy.objects.filter(origin=origin.id)
+    raw = Hs4_ccpy.objects.filter(origin=origin.id,year=year)
   else:
     raise Exception("Dataset not supported.")   
   
-  ## Trade Flow - defaults to "import" if fail 
+  region_list = list(Country_region.objects.all().values()) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  region = {}
+  for i in region_list: 
+    region[i['id']] = i
+  # ## Trade Flow - defaults to "import" if fail 
+  # # BECAUSE THIS IS SO INEFFIECENT using the DJANGO ORM
+  # 
+  # """Define parameters for query"""
+  # year_where = "AND year = %s" % year
+  # rca_col = "null"
+  # if trade_flow == "net_export":
+  #   val_col = "SUM(export_value - import_value) as val"
+  # elif trade_flow == "net_import":
+  #   val_col = "SUM(import_value - export_value) as val"
+  # elif trade_flow == "export":
+  #   val_col = "SUM(export_value) as val"
+  # else:
+  #   val_col = "SUM(import_value) as val"
+  # # 
+  # # '''Create query [year, id, abbrv, name_lang, val, rca]'''
+  # q = """
+  #   SELECT year, c.id, c.name_3char, c.name_%s, %s, %s 
+  #   FROM observatory_%s_ccpy as ccpy, observatory_country as c 
+  #   WHERE origin_id=%s and ccpy.destination_id = c.id %s
+  #   GROUP BY year, destination_id
+  #   HAVING val > 0
+  #   ORDER BY val DESC
+  #   """ % (lang, val_col, rca_col, classification, origin.id, year_where)
+  # # 
+  # rows = raw_q(query=q, params=None)
+  # total_val = sum([r[4] for r in rows])
+  # 
+  # """Add percentage value to return vals"""
+  # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
+  # rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
+  # 
+  # raise Exception(time.time() - start)
   #### Net Export
   if trade_flow == "net_export":
     fast = list(raw.values('destination','year',
@@ -443,7 +483,7 @@ def api_csay(request, classification, trade_flow, origin, year):
     # For convenience
     for x in fast: x['net'] = x['exp'] - x['imp']                        
     
-    build = [{"year":e['year'],"item_id":e['destination'], "name":e['destination__name_en'], 
+    build = [{"year":e['year'],"id":e['destination'], "name":e['destination__name_en'], 
               "abbr":e['destination__name_3char'], "value":e['net']} for e in fast]
                            
   elif trade_flow == "net_import":
@@ -456,23 +496,30 @@ def api_csay(request, classification, trade_flow, origin, year):
     # For convenience
     for x in fast: x['net'] = x['imp'] - x['exp']
                                                  
-    build = [{"year":e['year'],"item_id":e['destination'], "name":e['destination__name_en'], 
+    build = [{"year":e['year'],"id":e['destination'], "name":e['destination__name_en'], 
               "abbr":e['destination__name_3char'], "value":e['net']} for e in fast]
     
   elif trade_flow == "export":  
     fast = list(raw.filter(export_value__gt=0).values('destination','year',
                                                       'destination__name_en',
-                                                     'destination__name_3char').annotate(exp=Sum('export_value')))
+                                                      'destination__region_id',
+                                                      'destination__name_3char').annotate(exp=Sum('export_value')))
     
-    build = [{"year":e['year'],"item_id":e['destination'], "name":e['destination__name_en'], 
-              "abbrv":e['destination__name_3char'], "value":e['exp']} for e in fast]                                                
+    raise Exception
+     
+    build = [{"year":e['year'],"id":e['destination'], "name":e['destination__name_en'], 
+              "abbr":e['destination__name_3char'], 
+              "region_id":e['destination__region_id'],
+              "color": region[e['destination__region_id']]['color'],
+              "region_name":region[e['destination__region_id']]['name'],
+               "value":e['exp']} for e in fast]                                                
     
   else:
     fast = list(raw.filter(import_value__gt=0).values('destination','year',
                                                   'destination__name_en',
                                                   'destination__name_3char').annotate(imp=Sum('import_value')))                                              
     
-    build = [{"year":e['year'],"item_id":e['destination'], "name":e['destination__name_en'], 
+    build = [{"year":e['year'],"id":e['destination'], "name":e['destination__name_en'], 
               "abbr":e['destination__name_3char'], "value":e['imp']} for e in fast]
 
   """Set article variable for question """
@@ -501,7 +548,7 @@ def api_csay(request, classification, trade_flow, origin, year):
 def api_ccsy(request, classification, trade_flow, origin, destination, year):
   # Defaulting for the moment until we have the session variable 
   lang = "en"
-  
+  from redesign.models import *
   # Country
   origin = get_country(origin)
   if origin is None:
@@ -521,49 +568,73 @@ def api_ccsy(request, classification, trade_flow, origin, destination, year):
   if classification == "sitc4":
     raw = Sitc4_ccpy.objects.filter(origin=origin.id).filter(destination=destination.id)
   elif classification == "hs4":
-    raw = Hs4_ccpy.objects.filter(origin=origin.id).filter(destination=destination.id)
+    raw = Hs4_ccpy.objects.filter(origin=origin.id,destination=destination.id)
   else:
     raise Exception("Dataset not supported.")
-    
   
-    
+  attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
+  
   # Trade flow - defaults to import if invalid  
-  if trade_flow == "net_export":
-    fast = list(raw.values('year','product','product__code','product__name_en',
-                  'export_value','import_value'))
-    # Remove Negitives
-    fast = [x for x in fast if x['export_value'] - x['import_value'] > 0]
-    # Set set for convenience 
-    for x in fast: x['net'] = x['export_value'] - x['import_value']
-    
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['net']} for e in fast]
-    
-  elif trade_flow == "net_import":
-    fast = list(raw.values('year','product','product__code','product__name_en',
-                           'export_value','import_value'))
-    # Remove Negitives
-    fast = [x for x in fast if x['import_value'] - x['export_value'] > 0]
-    # Set set for convenience 
-    for x in fast: x['net'] = x['import_value'] - x['export_value']
-    
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['net']} for e in fast]
-
-  elif trade_flow == "export":
-    exp = raw.filter(export_value__gt=0)
-    fast = list(exp.values('year','product','product__code','product__name_en',
-                  'export_value','import_value'))
-    
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['export_value']} for e in fast]
-  else:
-    exp = raw.filter(import_value__gt=0)
-    fast = list(raw.values('year','product','product__code','product__name_en',
-                  'export_value','import_value'))
-    
-    build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-              "name":e['product__name_en'], "value":e['import_value']} for e in fast]
+  fast = list(raw.values('year',
+                         'product_id',
+                         'product_id__name',
+                         'product_id__name_en',
+                         'product_id__code',
+                         'product_id__community_id',
+                         'product_id__community_id__name',
+                         'product_id__community_id__color',
+                         'export_value',
+                         'import_value'))
+  
+  build = [{"year":e['year'],
+            "id":e['product_id'],
+            "name":e['product_id__name_en'], 
+            "code":e['product_id__code'],
+            "community_id":e['product_id__community_id'],
+            "community_name":e['product_id__community_id__name'],
+            "color":e['product_id__community_id__color'],
+            "export_value":e['export_value'],
+            "import_value": e['import_value']} for e in fast]
+  
+  # if trade_flow == "net_export":
+  #   fast = list(raw.values('year','product','product__code','product__name_en',
+  #                 'export_value','import_value'))
+  #   # Remove Negitives
+  #   fast = [x for x in fast if x['export_value'] - x['import_value'] > 0]
+  #   # Set set for convenience 
+  #   for x in fast: x['net'] = x['export_value'] - x['import_value']
+  #   
+  #   build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+  #             "name":e['product__name_en'], "value":e['net']} for e in fast]
+  #   
+  # elif trade_flow == "net_import":
+  #   fast = list(raw.values('year','product','product__code','product__name_en',
+  #                          'export_value','import_value'))
+  #   # Remove Negitives
+  #   fast = [x for x in fast if x['import_value'] - x['export_value'] > 0]
+  #   # Set set for convenience 
+  #   for x in fast: x['net'] = x['import_value'] - x['export_value']
+  #   
+  #   build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+  #             "name":e['product__name_en'], "value":e['net']} for e in fast]
+  # 
+  # elif trade_flow == "export":
+  #   exp = raw.filter(export_value__gt=0)
+  #   fast = list(exp.values('year','product','product__code','product__name_en',
+  #                 'export_value','import_value'))
+  #   
+  #   build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+  #             "name":e['product__name_en'], "value":e['export_value']} for e in fast]
+  # else:
+  #   exp = raw.filter(import_value__gt=0)
+  #   fast = list(raw.values('year','product','product__code','product__name_en',
+  #                 'export_value','import_value'))
+  #   
+  #   build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
+  #             "name":e['product__name_en'], "value":e['import_value']} for e in fast]
     
     
   
@@ -576,6 +647,7 @@ def api_ccsy(request, classification, trade_flow, origin, destination, year):
   json_response = {}
   json_response["data"] = build
   json_response["attr_data"] = Sitc4.objects.get_all(lang) if classification == "sitc4" else Hs4.objects.get_all(lang)
+  json_response["attr"] = attr
   json_response["country1"] = origin.to_json()
   json_response["country2"] = destination.to_json()
   json_response["title"] = get_question("ccsy", trade_flow=trade_flow,origin=origin,destination=destination)
@@ -584,11 +656,12 @@ def api_ccsy(request, classification, trade_flow, origin, destination, year):
   json_response["item_type"] = "product"
   json_response["app_type"] = "ccsy"
   json_response["other"] = query_params
-  
   """Return to browser as JSON for AJAX request"""
+
   return HttpResponse(json.dumps(json_response))
   
 def api_cspy(request, classification, trade_flow, origin, product, year):
+  from redesign.models import *
   lang = "en"
   total_val={}
   #  Sanity Checks
@@ -614,14 +687,13 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
   else:
     raise Exception("Dataset not supported.")
   
-  
-  
   # Article of speech
   article = "to" if trade_flow == "export" else "from"
    
   if trade_flow == "net_export":
     fast = list(raw.filter(export_value__gt=0).values('destination','year',
-                                                       'destination__name_en',
+                                                       'destination__name_en', 'destination__region_id',
+                                                       'destination__region_id__name', 'destination__region_id__color',
                                                        'destination__name_3char').annotate(imp=Sum('import_value'),
                                                                                            exp=Sum('export_value')))
      
@@ -629,36 +701,43 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
     # For convenience
     for x in fast: x['net'] = x['exp'] - x['imp']
      
-    build= [{"year":e['year'],"item_id":e['destination'],"abbr":e['destination__name_3char'],
+    build= [{"year":e['year'],"id":e['destination'],"name":e['destination__name_3char'],
+            "region_id":["destination__region_id"],"region_name":e["destination__region_id__name"],"color":e["destination__region_id__color"],
                "name":e['destination__name_en'], "value":e['net']} for e in fast]
      
   elif trade_flow == "net_import":
     fast = list(raw.filter(import_value__gt=0).values('destination','year',
-                                                       'destination__name_en',
+                                                       'destination__name_en','destination__region_id',
+                                                       'destination__region_id__name', 'destination__region_id__color',
                                                        'destination__name_3char').annotate(imp=Sum('import_value'),
                                                                                            exp=Sum('export_value')))
     fast = [x for x in fast if x['imp'] - x['exp'] > 0]
      # For convenience
     for x in fast: x['net'] = x['imp'] - x['exp']
      
-    build = [{"year":e['year'],"item_id":e['destination'],"abbr":e['destination__name_3char'],
+    build = [{"year":e['year'],"id":e['destination'],"name":e['destination__name_3char'],
+               "region_id":["destination__region_id"],"region_name":e["destination__region_id__name"],"color":e["destination__region_id__color"],
                "name":e['destination__name_en'], "value":e['net']} for e in fast]
    
   elif trade_flow == "export":
     fast = list(raw.filter(export_value__gt=0).values('destination','year',
-                                                       'destination__name_en',
+                                                       'destination__name_en','destination__region_id',
+                                                       'destination__region_id__name', 'destination__region_id__color',
                                                        'destination__name_3char').annotate(exp=Sum('export_value')))
      
-    build = [{"year":e['year'],"item_id":e['destination'],"abbr":e['destination__name_3char'],
-               "name":e['destination__name_en'], "value":e['exp']} for e in fast]
+    build = [{"year":e['year'],"id":e['destination'],"name":e['destination__name_3char'],
+              "region_id":e["destination__region_id"],"region_name":e["destination__region_id__name"],
+              "color": e['destination__region_id__color'], "name":e['destination__name_en'], "value":e['exp']} for e in fast]
    
   else:
     fast = list(raw.filter(import_value__gt=0).values('destination','year',
-                                                      'destination__name_en',
+                                                      'destination__name_en', 'destination__region_id',
+                                                      'destination__region_id__name', 'destination__region_id__color',
                                                       'destination__name_3char').annotate(imp=Sum('import_value')))
     
-    build= [{"year":e['year'],"item_id":e['country'],"abbr":e['destination__name_3char'],
-              "name":e['destination__name_en'], "value":e['imp']} for e in fast]
+    build= [{"year":e['year'],"id":e['destination'],"name":e['destination__name_3char'],
+              "region_id":e["destination__region_id"],"region_name":e["destination__region_id__name"],
+              "color": e['destination__region_id__color'], "name":e['destination__name_en'], "value":e['imp']} for e in fast]
     
   
   # Set query params with our changes
@@ -677,7 +756,7 @@ def api_cspy(request, classification, trade_flow, origin, product, year):
   json_response["item_type"] = "country"
   json_response["app_type"] = "cspy"
   json_response["other"] = query_params
-
+  # raise Exception(time.time() - start)
   ## Return to browser as JSON for AJAX request ##
   return HttpResponse(json.dumps(json_response))
 

@@ -592,6 +592,34 @@
 																	.name_array(["name"]);
   var flat_data,attr,complexity,
       year = "{{year}}";
+      sort_flat = function(arg){    
+    
+          arg.forEach(function(d){ 
+            if (trade_flow=="net_export"){
+                val = d.export_value - d.import_value;
+                if (val > 0 ){ 
+                  d.value = d.export_value - d.import_value;
+                  where.push(d);
+                }
+              } else if (trade_flow=="net_import") {
+                 val = d.import_value - d.export_value;
+                 if (val > 0 ){ 
+                   d.value = d.import_value - d.export_value;
+                   where.push(d);
+                  }        
+              } else if (trade_flow=="export"){
+                if (d.export_value > 0){
+                  d.value = d.export_value;
+                  where.push(d);
+                }
+              } else {
+                if (d.import_value > 0){
+                  d.value = d.import_value;
+                  where.push(d);
+                }
+              }})
+      
+            }      
      
   
   d3.json(redesign_api_uri,function(raw){
@@ -606,40 +634,33 @@
     
     where = []
     if (app_type == "casy" || app_type == "sapy" || app_type == "ccsy"){
-      flat_data.forEach(function(d){ 
-        if (trade_flow=="net_export"){
-            val = d.export_value - d.import_value;
-            if (val > 0 ){ 
-              d.value = d.export_value - d.import_value;
-              where.push(d);
-            }
-          } else if (trade_flow=="net_import") {
-             val = d.import_value - d.export_value;
-             if (val > 0 ){ 
-               d.value = d.import_value - d.export_value;
-               where.push(d);
-              }        
-          } else if (trade_flow=="export"){
-            if (d.export_value > 0){
-              d.value = d.export_value;
-              where.push(d);
-            }
-          } else {
-            if (d.import_value > 0){
-              d.value = d.import_value;
-              where.push(d);
-            }
-          }
-      })
-    } 
-
-    where.map(function(d,i){
+       sort_flat(flat_data); 
       
-      d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
-      d.nesting_1 = {"name":attr[d.code.slice(0, 2)].name,"id":d.code.slice(0, 2)};
-      d.nesting_2 = {"name":d.name,"id":d.id}; 
+      if (app_type == "casy" || app_type=="ccsy"){
+        where.map(function(d,i){
+      
+          d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
+          d.nesting_1 = {"name":attr[d.code.slice(0, 2)].name,"id":d.code.slice(0, 2)};
+          d.nesting_2 = {"name":d.name,"id":d.id}; 
        
-    })
+        }) 
+      } else {
+        
+        where.map(function(d,i){
+          d.nesting_0 = {"name" :d.region_name, "id":d.region_id};
+          d.nesting_1 = {"name":d.name,"id":d.id};
+        })    
+      }
+      
+    } else {
+      where = flat_data;
+      where.map(function(d,i){
+        d.nesting_0 = {"name":d.region_name,"id":d.region_id};
+        d.nesting_1 = {"name" :d.name, "id":d.item_id};
+      })
+    }
+
+    
     
     var nested_raw = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"}])
     console.log(nested_raw);
@@ -655,17 +676,17 @@
       .datum(nested_raw)
       .call(viz)
           
-    key = Key()
-      .classification(raw.class)
-      .showing(item_type)
+    // key = Key()
+    //   .classification(raw.class)
+    //   .showing(item_type)
 
     controls = Controls()
       .app_type(app_name)
       .year(year)
 
-    d3.select(".key")
-      .datum(attr_data)
-      .call(key);
+    // d3.select(".key")
+    //   .datum(attr_data)
+    //   .call(key);
 
 
     d3.select("#tool_pane")
@@ -682,8 +703,7 @@
     // d3.select(".key")
     //   .datum(data.attr_data)
     //   .call(key);
-  
-  
+
   
   
   </script>
