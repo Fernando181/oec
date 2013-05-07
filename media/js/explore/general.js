@@ -68,12 +68,14 @@ function clean_attr_data(attrs){
     var id_property = attr["community_id"] ? "community_id" : "region_id",
       name_property = attr["community__name"] ? "community__name" : "region__name",
       color_property = attr["community__color"] ? "community__color" : "region__color",
-      text_color_property = attr["community__text_color"] ? "community__text_color" : "region__text_color";
+      text_color_property = attr["community__text_color"] ? "community__text_color" : "region__text_color",
+      continent_property = attr["continent"] ? "continent" : "";
     attr["category_id"] = attr[id_property]; delete attr[id_property];
     attr["category_name"] = attr[name_property]; delete attr[name_property];
     attr["category_color"] = attr[color_property]; delete attr[color_property];
     attr["category_text_color"] = attr[text_color_property]; delete attr[text_color_property];
     attr["heirarchical_id"] = attr["category_id"].toString().substr(0,1) + "." + attr["category_id"] + "." + attr["id"];
+    attr["category_continent"] = attr[continent_property]; delete attr[continent_property];
   })
 
   // turn flat attributes array into indexed object with ids

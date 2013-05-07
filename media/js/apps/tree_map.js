@@ -147,7 +147,7 @@ function App() {
       .attr("stroke", "white")
       .attr("stroke-width", 0.4)
       .attr("fill", function(d) {
-        if(highlight && attr_data[d.item_id].category_id != highlight){
+      if(highlight && attr_data[d.item_id].category_id != highlight){
           return "#CCC";
         }
         return attr_data[d.item_id].category_color;

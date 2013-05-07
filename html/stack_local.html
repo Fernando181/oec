@@ -494,7 +494,7 @@ var attr,flat_data,complexity;
     years.forEach(function(entry) {
 		    console.log(entry);
 		    var entryData = flat_data.filter(function(d){return d.year == entry})
-		    var nestedEntry = vizwhiz.utils.nest(entryData, ["nesting_0"], true,
+		    var nestedEntry = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1","nesting_2"], true,
 		        [{"key":"val_usd", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
 				console.log(nestedEntry);		
 				data = data.concat(nestedEntry);	

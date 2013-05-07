@@ -333,7 +333,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   warning, alert, title = None, None, None
   data_as_text = {}
   # What is actually being shown on the page
-  item_type = "products"
+  item_type = "product"
   
   # Test for country exceptions
   if prod_class == "hs4":
@@ -419,7 +419,17 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
         request.session['product_classification'] = "hs4"
     else:
       alert = {"title": "Product could not be found", "text": "There was no product with the 4 digit code <strong>%s</strong>. Please double check the <a href='/about/data/hs4/'>list of HS4 products</a>."%(p_code)}
+  
+  if countries[0]:
+    # get distinct years from db, different for diff product classifications
+    # also we need to filter by country1, as not all SITC4 data goes back to '62
+    years_available = list(Sitc4_cpy.objects.filter(country=countries[0].id).values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.filter(country=countries[0].id).values_list("year", flat=True).distinct())
+  else:
+    years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  
+  years_available.sort()
 
+  
   if not alert:
     if app_type == "casy":
       title = "What does %s %s?" % (countries[0].name, trade_flow.replace("_", " "))

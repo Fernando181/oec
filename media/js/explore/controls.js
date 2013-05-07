@@ -166,12 +166,12 @@ function Controls() {
   function toggle_view_table(){
     if(d3.select("#text_data").style("display") == "none"){
       d3.select(this).select("span").text("View app")
-      d3.select("#dataviz").style("display", "none")
+      d3.select("#viz").style("display", "none")
       d3.event.preventDefault();
       return d3.select("#text_data").style("display", "block")
     }
     d3.select(this).select("span").text("View as text")
-    d3.select("#dataviz").style("display", "block")
+    d3.select("#viz").style("display", "block")
     d3.event.preventDefault();
     return d3.select("#text_data").style("display", "none")
   }

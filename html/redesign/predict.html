@@ -128,7 +128,7 @@
 		
 		<style>
 		.chart {
-
+    
 		}
 
 		.main text {
@@ -139,6 +139,7 @@
 		    shape-rendering: crispEdges;
 		    stroke: black;
 		    fill: none;
+       
 		}
 
 		circle {
@@ -152,17 +153,52 @@
 		  height: auto;                 
 		  padding: 2px;             
 		  font: 12px sans-serif; 
-			color: white;       
-		  background: brown;   
-		  border: 2px solid tan;      
+			color: black;       
+		  background: white;   
+		  border: 2px solid black;      
 /*		  border-radius: 4px;           */
 		  pointer-events: none;         
 		}
 		
+    .grid .tick {
+        stroke: lightgrey;
+        opacity: 0.7;
+    }
+    .grid path {
+          stroke-width: 1;
+    }
+    
+    .grid text {
+        stroke: black;
+    }
+    
+    #slider {
+      width:400px;
+    }
+    
 		</style>
-		
+    
+    <style>
+    .ui-autocomplete {
+      max-height: 100px;
+      overflow-y: auto;
+      /* prevent horizontal scrollbar */
+      overflow-x: hidden;
+    }
+    /* IE 6 doesn't support max-height
+     * we use height instead, but this forces the menu to always be this tall
+     */
+    * html .ui-autocomplete {
+      height: 100px;
+    }
+    </style>
+    
+    <link href='http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="/media/js/libs/bootstrap/css/bootstrapSwitch.css">
 		<body>
 		<script src="http://d3js.org/d3.v3.min.js"></script>
+
+    
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -193,11 +229,27 @@
         <!-- Scatterpot & Static Bar Charts-->
         <div class="row">
 
-    			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}</p>
+    			<p class="lead pagination-centered">{{country.name}}, {{country.name_3char}}
+            <div class="ui-widget pagination-centered">
+              <label for="tags">Somewhere else: </label>
+              <input id="country" />
+            </div>
+          </p>
+          
 		
     			<div class='content pagination-centered'>
-			  
-    			</div>	
+			    </div>	
+          <p class="pagination-centered">
+            Restrict to Export Value Greater Than: $<span id="restrict">0</span>
+          </p>
+          
+          <div class="pagination-centered"  style="margin-left:auto;margin-right:auto;" id="slider">
+          </div>
+          <div id="mySwitch" class="switch pagination-centered" 
+              data-on="success" data-off="warning" data-on-label="Star" data-off-label="Log" style="margin-left:auto;margin-right:auto;width:50px;">
+              <input id="chx" type="checkbox" checked />
+          </div>
+          
             <!-- Show only M^ figures -->
       			<p class="pagination-centered">"Present"</p>
       			<p class="pagination-centered" id="d1"></p>
@@ -306,7 +358,12 @@
 		<script src="/media/js/libs/bootstrap/js/bootstrap.min.js"></script>
 		<script src="/media/js/libs/jquery/stupidtable.js" ></script>
 		<script src="/media/js/libs/d3/highlight.min.js" ></script>
-		
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+   <script type="text/javascript" src="/media/js/libs/bootstrap/js/bootstrapSwitch.js"></script>
+    
 		<script>
 			  $("#absent").stupidtable();
 				$("#present").stupidtable();
@@ -763,9 +820,82 @@
 		    .attr("y2", 120)
 		    .style("stroke", "#000");			
 		
-		var all_prod = {{all_prod|safe}}
-		
+		var all_prod = {{all_prod|safe}},
+        exp_values = {{exp_values|safe}}
+        all_countries = {{all_countries|safe}}
+        
+        all_prod.map(function(d)
+        { 
+          d.export_value = exp_values[d.hs4]['export_value'];
+          d.color = exp_values[d.hs4]['product__community_id__color']
+        })
+
+  Array.prototype.contains = function(obj) {
+      var i = this.length;
+      while (i--) {
+          if (this[i] === obj) {
+              return true;
+          }
+      }
+      return false;
+  }
+   
+  handle = []
+  // Use this function to filter by export value amount
+  function pan(amt)
+  {
+    handle=[]
+    all_prod.forEach(function(d){
+      if (d.export_value > amt)
+      {
+        handle.push(d);
+      } 
+    });
+    return handle;
+  }  
+
+  
+  $('#mySwitch').on('switch-change', function (e, data) {
+      var $el = $(data.el)
+        , value = data.value;
+      console.log(e, $el, value);
+      
+      if (value==true){
+        re_scatter(pan($("#restrict").text()),"Star");
+      }
+      else 
+      {
+        re_scatter(pan($("#restrict").text()),"Log");
+      }
+      
+      
+  });
+  
+  $( "#country" ).autocomplete({
+        minLength: 0,
+        source: all_countries,
+        focus: function( event, ui ) {
+          $( "#country" ).val( ui.item[0] );
+          return false;
+        },
+        select: function( event, ui ) {
+          console.log(ui.item[0])
+          window.location = "/redesign/predict/"+ui.item[1]
+          // $( "#project" ).val( ui.item.label );
+          // $( "#project-id" ).val( ui.item.value );
+//           $( "#project-description" ).html( ui.item.desc );
+//           $( "#project-icon" ).attr( "src", "images/" + ui.item.icon );
+ 
+          return false;
+        }
+      })
+      .data( "ui-autocomplete" )._renderItem = function( ul, item ) {
+        return $( "<li>" )
+          .append( "<a>" + item[0] + "</a>" )
+          .appendTo( ul );
+      };
 		</script>
+
 		<script type="text/javascript" src="/media/js/libs/d3/scatterplot.js"></script>
 		
 		

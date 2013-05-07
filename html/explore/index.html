@@ -25,6 +25,8 @@
   <link rel="stylesheet" href="/media/css/style.css">
   <link rel="stylesheet" href="/media/js/libs/chosen/chosen.css" />
   <link rel="stylesheet" href="/media/js/libs/tipsy/tipsy.css" />
+  <link rel="stylesheet" href="/media/js/libs/vizwiz/src/utils.slider.css" />
+  <!-- <link rel="stylesheet" href="/media/js/libs/bootstrap/css/bootstrap.css" /> -->
   <!-- <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" type="text/css" media="all" /> -->
   <link rel="stylesheet" href="/media/js/libs/jquery-ui/jquery-ui.css" type="text/css" media="all" />
   
@@ -120,27 +122,27 @@
             <div>
               <h4>{% trans "Country" %}</h4>
               <ul>
-                <li><a class="casy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2009/" >{% trans "Exports" %}</a></li>
-                <li><a class="casy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2009/">{% trans "Imports" %}</a></li>
-                <li><a class="casy" href="/explore/tree_map/net_export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2009/">{% trans "Net Exports" %}</a></li>
-                <li><a class="casy" href="/explore/tree_map/net_import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2009/">{% trans "Net Imports" %}</a></li>
+                <li><a class="casy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2010/" >{% trans "Exports" %}</a></li>
+                <li><a class="casy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2010/">{% trans "Imports" %}</a></li>
+                <li><a class="casy" href="/explore/tree_map/net_export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2010/">{% trans "Net Exports" %}</a></li>
+                <li><a class="casy" href="/explore/tree_map/net_import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2010/">{% trans "Net Imports" %}</a></li>
               </ul>
               <h4>{% trans "Country (show trade partners)" %}</h4>
               <ul>
-                <li><a class="csay" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/all/2009/">{% trans "Exports" %}</a></li>
-                <li><a class="csay" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/all/2009/">{% trans "Imports" %}</a></li>
+                <li><a class="csay" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/all/2010/">{% trans "Exports" %}</a></li>
+                <li><a class="csay" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/all/2010/">{% trans "Imports" %}</a></li>
               </ul>
               <h4>{% trans "Products" %}</h4>
               <ul>
-                <li><a class="sapy" href="/explore/tree_map/export/show/all/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2009/">{% trans "Exports To Destination" %}</a></li>
-                <li><a class="sapy" href="/explore/tree_map/import/show/all/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2009/">{% trans "Imports From Origin" %}</a></li>
+                <li><a class="sapy" href="/explore/tree_map/export/show/all/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2010/">{% trans "Exports To Destination" %}</a></li>
+                <li><a class="sapy" href="/explore/tree_map/import/show/all/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2010/">{% trans "Imports From Origin" %}</a></li>
               </ul>
               <h4>{% trans "Bilateral" %}</h4>
               <ul>
-                <li><a class="ccsy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/chn/show/2009/">{% trans "Exports To Destination" %}</a></li>
-                <li><a class="ccsy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/chn/show/2009/">{% trans "Imports From Origin" %}</a></li>
-                <li><a class="cspy" href="/explore/tree_map/export/{{country_code}}/show/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2009/">{% trans "Exports by Product" %}</a></li>
-                <li><a class="cspy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2009/">{% trans "Imports by Product" %}</a></li>
+                <li><a class="ccsy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/chn/show/2010/">{% trans "Exports To Destination" %}</a></li>
+                <li><a class="ccsy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/chn/show/2010/">{% trans "Imports From Origin" %}</a></li>
+                <li><a class="cspy" href="/explore/tree_map/export/{{country_code}}/show/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/2010/">{% trans "Exports by Product" %}</a></li>
+                <li><a class="cspy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}/  /">{% trans "Imports by Product" %}</a></li>
               </ul>
             </div>
           </div>
@@ -176,7 +178,7 @@
           <div>
             <h3><a href="#">Product Space</a></h3>
             <ul>
-              <li><a class="casy" href="/explore/product_space/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2009/">Product Space of {% trans "Exports" %}</a></li>
+              <li><a class="casy" href="/explore/product_space/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/all/show/2010/">Product Space of {% trans "Exports" %}</a></li>
               <li><a class="disabled" href="#">Density Product Space</a></li>
             </ul>
           </div>
@@ -190,10 +192,10 @@
           <div>
             <h3><a href="#">Maps</a></h3>
             <ul>
-              <li><a class="sapy" href="/explore/map/export/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2009/">Exports</a></li>
-              <li><a class="sapy" href="/explore/map/import/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2009/">Imports</a></li>
-              <li><a class="sapy" href="/explore/map/net_export/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2009/">Net exports</a></li>
-              <li><a class="sapy" href="/explore/map/net_import/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2009/">Net imports</a></li>
+              <li><a class="sapy" href="/explore/map/export/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2010/">Exports</a></li>
+              <li><a class="sapy" href="/explore/map/import/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2010/">Imports</a></li>
+              <li><a class="sapy" href="/explore/map/net_export/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2010/">Net exports</a></li>
+              <li><a class="sapy" href="/explore/map/net_import/show/all/{%if product_classification == "sitc4"%}3330{% else %}2709{% endif %}/2010/">Net imports</a></li>
             </ul>
           </div>
         </div>
@@ -239,8 +241,9 @@
         
         <!-- Container for the timeline -->
         <div id="timeline">
-          <div class="slider" id="year"></div>
-          {% if app_name != "stacked" %}
+          <div class="ui_bottom" id="ui_bottom" style="bottom:0px"></div>
+          <!-- <div class="slider" id="year"></div> -->
+          <!-- {% if app_name != "stacked" %}
           <a class="prev" href="/explore/{{app_name}}/{{trade_flow}}/{% if country1.name_3char %}{{country1.name_3char|lower}}{% else %}{{country1}}{% endif %}/{% if country2.name_3char %}{{country2.name_3char|lower}}{% else %}{{country2}}{% endif %}/{% if product.code %}{{product.code}}{% else %}{{product}}{% endif %}/{% if year > years_available.0 %}{{year|add:-1}}{% else %}{{years_available.last}}{% endif %}/">&laquo; {% trans "Previous" %}</a>
             <button id="play">{% trans "Play" %}</button>
             <button id="stop">{% trans "Stop" %}</button>
@@ -261,21 +264,21 @@
               <input type="radio" id="value" name="layout" checked="checked" /><label for="value">value</label>
               <input type="radio" id="share" name="layout" /><label for="share">share</label>
             </div>
-						<div id="stacked_order">
+            <div id="stacked_order">
               <p>Ordering:</p>
               <input type="radio" id="community" name="order" checked="checked" /><label for="community">community</label>
               <input type="radio" id="name" name="order" /><label for="name">name</label>
               <input type="radio" id="val" name="order" /><label for="val">value</label>
             </div>
-						{% if app_type == "casy" %}
-						<div id="stacked_capita">
+            {% if app_type == "casy" %}
+            <div id="stacked_capita">
               <p>Adjust:</p>
               <input type="radio" id="total" name="capita" checked="checked" /><label for="total">Total</label>
               <input type="radio" id="per" name="capita" /><label for="per">Per Capita</label>
             </div>
-						{% endif %}
-					</div>
-          {% endif %}
+            {% endif %}
+          </div>
+          {% endif %} -->
         </div>
         {% endif %}
 
@@ -416,7 +419,7 @@
         </div>
         <div class="control_container">
           <h3>{% trans "Embed" %}</h3>
-          <input type="text" class="embed_code" value='&lt;iframe width="560" height="315" src="http://atlas.media.mit.edu/embed/tree_map/import/usa/show/all/2009/" frameborder="0" &gt;&lt;/iframe&gt;'></input>
+          <input type="text" class="embed_code" value='&lt;iframe width="560" height="315" src="http://atlas.media.mit.edu/embed/tree_map/import/usa/show/all/2010/" frameborder="0" &gt;&lt;/iframe&gt;'></input>
         </div>
         <div class="product_class">
           Product classification:
@@ -425,6 +428,19 @@
             <option value="hs4" {% if prod_class == "hs4" %} selected="selected" {% endif %}>HS4</option>
           </select>
         </div>
+        <div class="nesting">
+          Detail:
+          <select id="nesting_level" name="nesting" onchange="nest_drop_report(this.value)"> 
+            <option value="nest0">Low</option>
+            {% if app_type == "casy" %}
+            <option value="nest1">Mid</option>
+            {% endif %}
+            {% if app_type == "ccsy" %}
+            <option value="nest1">Mid</option>
+            {% endif %}
+            <option value="nest2" selected>Hi</option>
+          </select>
+        </div>  
       </div>
       
     </div> <!-- END #main -->
@@ -513,10 +529,7 @@
   <script src="/media/js/explore/key.js"></script>
   <script src="/media/js/explore/timeline.js"></script>
   <script src="/media/js/explore/controls.js"></script>
-  {% if app_name == "tree_map" %}<script src="/media/js/apps/tree_map.js"></script>{% endif %}
-  {% if app_name == "stacked" %}<script src="/media/js/apps/stacked.js"></script>{% endif %}
-  {% if app_name == "product_space" %}<script src="/media/js/apps/product_space.js"></script>{% endif %}
-  {% if app_name == "map" %}<script src="/media/js/apps/map.js"></script>{% endif %}
+  
   <script>
   // google analytics
   var _gaq=[['_setAccount','UA-22403682-3'],['_trackPageview']]; 
@@ -539,11 +552,13 @@
     country2 = "{{country2}}",
     product = "{{product}}",
     item_type = "{{item_type}}",
+    lang= "{{lang}}",
 		redesign_api_uri = "{{redesign_api_uri}}",
     prod_class = "{{prod_class}}";
   
   // Use chosen plugin to make dropdowns look fancy
   $(".dropdown_container select").chosen()
+  $(".nesting select").chosen()
   // language select dropdown
   $(".language_select select").chosen();
   $(".language_select .chzn-search").hide();
@@ -584,128 +599,413 @@
   <script src="/media/js/libs/vizwiz/src/general.js"></script>
   <script src="/media/js/libs/vizwiz/src/utils.js"></script>
   <script src="/media/js/libs/vizwiz/src/tooltip.js"></script>
-  <script src="/media/js/libs/vizwiz/src/viz/tree_map.js"></script>
+  <script src="/media/js/libs/vizwiz/src/utils.slider.js"></script>
+  {% if app_name == "tree_map" %}<script src="/media/js/libs/vizwiz/src/viz/tree_map.js"></script>{% endif %}
+  {% if app_name == "stacked" %}<script src="/media/js/libs/vizwiz/src/viz/stacked.js"></script>{% endif %}
+  {% if app_name == "scatter" %}<script src="/media/js/libs/vizwiz/src/viz/pie_scatter.js"></script>{% endif %}
+  {% if app_name == "product_space" %}<script src="/media/js/libs/vizwiz/src/viz/network.js"></script>{% endif %}
+ 
   <script>
-
-  var viz = vizwhiz.viz.tree_map().height(520)
-	 																.width(640)
-																	.name_array(["name"]);
-  var flat_data,attr,complexity,
-      year = "{{year}}";
-      sort_flat = function(arg){    
-    
-          arg.forEach(function(d){ 
-            if (trade_flow=="net_export"){
-                val = d.export_value - d.import_value;
-                if (val > 0 ){ 
-                  d.value = d.export_value - d.import_value;
-                  where.push(d);
-                }
-              } else if (trade_flow=="net_import") {
-                 val = d.import_value - d.export_value;
-                 if (val > 0 ){ 
-                   d.value = d.import_value - d.export_value;
-                   where.push(d);
-                  }        
-              } else if (trade_flow=="export"){
-                if (d.export_value > 0){
-                  d.value = d.export_value;
-                  where.push(d);
-                }
-              } else {
-                if (d.import_value > 0){
-                  d.value = d.import_value;
-                  where.push(d);
-                }
-              }})
-      
-            }      
-     
+  var flat_data,
+      attr,
+      complexity,
+      viz,
+      rawData,
+      where = []
+      // year = "{{year}}";
   
-  d3.json(redesign_api_uri,function(raw){
-    console.log(raw["data"]);
+  Array.prototype.contains = function(obj) {
+      var i = this.length;
+      while (i--) {
+          if (this[i] === obj) {
+              return true;
+          }
+      }
+      return false;
+  }
+  
+  function nest_drop_report(nest_level) 
+  {
+    if (nest_level == "nest0") {
+      set_tree_nesting(nest0);
+    }
+    else if (nest_level == "nest1"){
+      set_tree_nesting(nest1);
+    }
+    else {
+      set_tree_nesting(nest2);
+    }
+  }
+  
+  get_totals = function(){
+    annual = {}  
+    years_available.forEach(function(d){
+      data = rawData["data"];
+      flat = data.filter(function(g){ return g.year == d; })
+      flat = flat.filter(function(z){ return z.community_id != undefined})
+      sort_flat(flat)
+      x = d3.sum(flat, function(t){ return t["value"] })
+      annual[d] = x
+    })
+    // d3.sum(current, function(d){ return d["value"] })
+  }     
+  
+  set_tree_nesting = function(arg) 
+  {
     
-    flat_data=raw["data"]
-    attr=raw["attr"]
-    attr_data = raw["attr_data"]
-    attr_data = clean_attr_data(attr_data)
-    
-    flat_data = flat_data.filter(function(d){ return d.year == year; })
-    
-    where = []
-    if (app_type == "casy" || app_type == "sapy" || app_type == "ccsy"){
-       sort_flat(flat_data); 
       
-      if (app_type == "casy" || app_type=="ccsy"){
-        where.map(function(d,i){
-      
-          d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
-          d.nesting_1 = {"name":attr[d.code.slice(0, 2)].name,"id":d.code.slice(0, 2)};
-          d.nesting_2 = {"name":d.name,"id":d.id}; 
-       
-        }) 
-      } else {
+      d3.select("#viz")
+             .datum(arg)
+             .call(viz);
+             
+      // make_total(arg.children);       
+  }
+  
+  check_category_presence = function(arg){
+    missing = []
+    current = []
+    arg.forEach(function(d){
+      current.push(d.name)
+    })
+    
+    if (prod_class=="sitc4"){
+      $.each(sitcs,function(key,val){
+          if(current.contains(val.name)){
+            console.log("yes")
+            return true;
+          }
+          missing.push(val);
+          return false;
+        })
+    }
+    else 
+    {
+      $.each(cats,function(key,val){
+          if(current.contains(val.name)){
+            console.log("yes")
+            return true;
+          }
+          missing.push(val);
+          return false;
+        })
+    }
+    return missing;
+  }
         
+  set_scatter_nesting = function(arg)
+  {
+      viz
+        .text_var("name")
+        .id_var("id")
+        .xaxis_var("distance")
+        .xaxis_domain(d3.extent(arg,function(d){return d.distance}))
+        .yaxis_var("complexity")
+        .yaxis_domain(d3.extent(arg,function(d){return d.complexity}).reverse())
+        .value_var("val_usd")
+        .tooltip_info(["distance", "complexity", "value"])
+
+      d3.select("#viz")
+        .datum(arg)
+        .call(viz);
+  }  
+      
+  sort_flat = function(arg)
+  {
+      arg.forEach(function(d){ 
+        if (trade_flow=="net_export"){
+            val = d.export_value - d.import_value;
+            if (val > 0 ){ 
+              d.value = d.export_value - d.import_value;
+              // where.push(d);
+            }
+          } else if (trade_flow=="net_import") {
+             val = d.import_value - d.export_value;
+             if (val > 0 ){ 
+               d.value = d.import_value - d.export_value;
+               // where.push(d);
+              }        
+          } else if (trade_flow=="export"){
+            if (d.export_value > 0){
+              d.value = d.export_value;
+              // where.push(d);
+            }
+          } else {
+            if (d.import_value > 0){
+              d.value = d.import_value;
+              // where.push(d);
+            }
+          }
+        })
+  }
+  
+  set_year = function(arg){ 
+  
+    if (years_available.contains(arg)){
+      data = rawData["data"];
+      year = arg
+      flat = data.filter(function(d){ return d.year == arg; })
+      // d3.select("#viz").call(viz.absolute_total(null))
+    }
+    where = [];
+    construct_nest(flat);
+    // Nesting defaults
+    // nest0 = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"}])
+    if (app_type == "casy" || app_type == "ccsy"){
+      nest0 = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"},{"key":"year"}])
+    }
+    else 
+    {
+      nest0 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1"], false, [{"key":"color"},{"key":"year"}])  
+    }
+    
+    nest1 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1"], false, [{"key":"color"},{"key":"year"}])
+    nest2 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1","nesting_2"], false, [{"key":"color"},{"key":"year"}])
+    
+    var nest_level = ($("#nesting_level").val());
+    
+    viz
+      .tooltip_info(["value"])
+      .value_var("value")
+    
+    if (nest_level == "nest0") {
+      d3.select("#viz")
+             .datum(nest0)
+             .call(viz);
+    }
+    else if (nest_level == "nest1"){
+      d3.select("#viz")
+             .datum(nest1)
+             .call(viz);
+      
+    }
+    else {
+      d3.select("#viz")
+             .datum(nest2)
+             .call(viz);
+      
+    }
+    
+  }
+  
+  construct_nest = function(flat){
+    // Ask for visualizations that need to be sorted by export/import/net values
+    if (app_type == "casy" || app_type == "sapy" || app_type == "ccsy")
+    {
+      
+      sort_flat(flat); 
+      
+      if (app_type == "casy" || app_type=="ccsy")
+      {
+        
+        where = flat.filter(function(d){ return d.community_id != undefined; })
+        
+        // flat.map(function(d){
+//           if (d.community_id == undefined){
+//             d.community_id = 90;
+//             d.community_name = "Not classified" 
+//             d.color = "#9C9A87"
+//           }
+//         })
+        
+        // where=flat
         where.map(function(d,i){
-          d.nesting_0 = {"name" :d.region_name, "id":d.region_id};
-          d.nesting_1 = {"name":d.name,"id":d.id};
+          
+          if (prod_class == "hs4")
+          {
+            d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
+            d.nesting_1 = {"name":attr[d.code.slice(0, 2)].name,"id":d.code.slice(0, 2)};
+          }
+          else // sitc4 codes end in 00's
+          {
+            d.color = attr[d.code.slice(0, 1)+"000"].color
+            d.nesting_0 = {"name" :attr[d.code.slice(0, 1)+"000"].name, "id":d.code.slice(0, 1)};
+            // d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
+            d.nesting_1 = {"name":attr[d.code.slice(0, 2)+"00"].name, 
+                           "id":d.code.slice(0, 2)+"00000"};
+            // d.nesting_1 = {"name":attr[d.code.slice(0, 2)+"00"].name, 
+                           // "id":d.community_id.toString()+d.code.slice(0, 2)};
+          }
+          d.nesting_2 = {"name":d.name,"id":d.code}; 
+         }) 
+      } 
+      else //SAPY query displays country information and needs different tailored nesting
+      {
+        region = rawData["region"];
+        continent = rawData["continents"];
+        
+        // What to do with countries that do not have regions predefined? 
+        // Filtering them for now I guess.. "final solution" ???
+        where = flat.filter(function(d){ return d.region_id != undefined; })
+      
+        where.map(function(d,i){
+          // console.log("We are testing region id'ing for '64: "+region[d.region_id].name);
+          d.color = region[d.region_id].color;
+          d.id = d.id * 10000
+          d.nesting_0 = {"name" :d.continent, "id":String(continent[d.continent])};
+          d.nesting_1 = {"name":region[d.region_id].name, "id":String(d.region_id)};
+          d.nesting_2 = {"name":d.name,"id":String(d.id)};
         })    
       }
+    
+    }    
+    else  // The remaining queries CSAY and CSPY were preprocessed per the query group_by statement
+    {
+      region = rawData["region"];
+      continent = rawData["continents"];      
+      // What to do with countries that do not have regions predefined? 
+      // Filtering them for now
+      where = flat.filter(function(d){ return d.region_id != undefined; })
       
-    } else {
-      where = flat_data;
-      where.map(function(d,i){
-        d.nesting_0 = {"name":d.region_name,"id":d.region_id};
-        d.nesting_1 = {"name" :d.name, "id":d.item_id};
-      })
+      where.map(function(d,i)
+        {
+          d.color = region[d.region_id].color;
+          d.id = d.id * 10000
+          d.nesting_0 = {"name" :d.continent, "id":String(continent[d.continent])};
+          d.nesting_1 = {"name":region[d.region_id].name,"id":String(d.region_id)};
+          d.nesting_2 = {"name":d.name,"id":String(d.id)};
+        })
     }
-
+  }
+  
+  tree = function()
+  {
+    viz = vizwhiz.viz.tree_map().height(503)
+  	 																.width(640)
+  																	.name_array(["name"]);
+      // Nesting defaults
+      if (app_type == "casy" || app_type == "ccsy"){
+        nest0 = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"},{"key":"year"}])
+      }
+      else 
+      {
+        nest0 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1"], false, [{"key":"color"},{"key":"year"}])  
+      }
+    // nest0 = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"}])
+    nest1 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1"], false, [{"key":"color"},{"key":"year"}])
+    nest2 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1","nesting_2"], false, [{"key":"color"},{"key":"year"}])  
     
     
-    var nested_raw = vizwhiz.utils.nest(where, ["nesting_0"], false, [{"key":"color"}])
-    console.log(nested_raw);
     
-    //raw.map(function())
+    // nest2 = vizwhiz.utils.nest(where, ["nesting_0","nesting_1","nesting_2"], false, [{"key":"color"}])
     viz
       .id_var("id")
       .text_var("name")
       .value_var("value")
-      .tooltip_info(["distance", "complexity", "value"])
-
-    d3.select("#viz")
-      .datum(nested_raw)
-      .call(viz)
+      .tooltip_info(["value"])
+      .total_bar(true);
+   
+    set_tree_nesting(nest2);
           
-    // key = Key()
-    //   .classification(raw.class)
-    //   .showing(item_type)
+    key = Key()
+      .classification(rawData.class)
+      .showing(item_type)
+
+    d3.select(".key")
+      .datum(attr_data)
+      .call(key);
 
     controls = Controls()
       .app_type(app_name)
       .year(year)
-
-    // d3.select(".key")
-    //   .datum(attr_data)
-    //   .call(key);
-
-
+    
     d3.select("#tool_pane")
-      .datum(raw)
-      .call(controls);
+      .datum(rawData)
+      .call(controls); 
+  }
+  
+  stack = function()
+  {
+    var viz = vizwhiz.viz.stacked().height(520).width(640).margin({top: 10, right: 40, bottom: 75, left: 80})
+      .xaxis_var("year")
+      .value_var("val_usd")
+      .tooltip_info(["id", "complexity", "distance"])
+      .text_var("name")
+      .id_var("id");
+
+    var attr,flat_data,complexity;
+	  
+		var x = "{{year_end}}"
+		console.log(x);
+    years = d3.range("{{year_start}}",parseInt("{{year_end}}")+1)
+		data = []
+		attr = raw["attr"];
+    flat_data = raw["data"];
+
+    flat_data.map(function(d,i){
+  
+      d.nesting_0 = {"name":d.community_name,"id":d.community};
+      d.nesting_1 = {"name":attr[d.code.slice(0, 2)].name,"id":d.code.slice(0, 2)};
+      d.nesting_2 = {"name":d.name,"id":d.id}; 
+   
+    })
+
+    years.forEach(function(entry) {
+		    console.log(entry);
+		    var entryData = flat_data.filter(function(d){return d.year == entry})
+		    var nestedEntry = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1","nesting_2"], true,
+		        [{"key":"val_usd", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
+				console.log(nestedEntry);		
+				data = data.concat(nestedEntry);	
+		});
+
+
+
+		console.log(data);
+
+    d3.select("#viz")
+      .datum(data)
+      .call(viz)
+    	
+  }
+  //
+  // the sparkplug that drives my vizwiz engine
+  //
+  d3.json(redesign_api_uri,function(raw)
+  {
+    rawData = raw;
+    
+    item_type = raw["item_type"]
+    flat_data=raw["data"]
+    attr=raw["attr"]
+    attr_data = raw["attr_data"]
+    
+    if (prod_class == "sitc4" && (app_type == "casy" || app_type == "ccsy")){
+      attr_data.map(function(g){
+        g.sitc1_name = attr[g.code.slice(0, 1)+"000"].name; 
+        g.sitc1_id = parseInt(g.code.slice(0, 1)+"000");
+        g.sitc1_color = attr[g.code.slice(0, 1)+"000"].color
+      })
+    }
+    
+    attr_data = clean_attr_data(attr_data)
+    
+    flat_data = flat_data.filter(function(d){ return d.year == year; })
+    
+    construct_nest(flat_data);
+    get_totals();
      
-      
-  })
-
-    // key = Key()
-    //   .classification(data.other.product_classification)
-    //   .showing(showing)  
-    // 
-    // d3.select(".key")
-    //   .datum(data.attr_data)
-    //   .call(key);
-
+    if (app_name=="tree_map"){
+      tree();
+    } 
+    
+    // Create Year Toggle
+    if (app_name != "stacked") {
+      var timeline = Slider()
+        .callback('set_year')
+        .initial_value(parseInt(year))
+        .max_width(540)
+        .title("")
+      d3.select("#ui_bottom").append("div")
+        .attr("class","slider")
+        // .style("overflow","auto")
+        .datum(years_available)
+        .call(timeline)
+      d3.select("#ui_bottom").append("br")
+    }
+    
+    
+  })  
   
-  
-  </script>
+ </script>
 </body>
 </html>

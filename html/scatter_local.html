@@ -484,24 +484,28 @@ d3.json("/redesign/api/complex/{{origin.name_3char}}/{{year}}", function(raw){
     
   })
  
-  var nested = vizwhiz.utils.nest(flat_data, ["nesting_0"], true,
+      nested2 = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1","nesting_2"], true,
       [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
-
-  
       
-  console.log(nested);
+      nested1 = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1"], true,
+            [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
+            
+      nested0 = vizwhiz.utils.nest(flat_data, ["nesting_0"], true,
+            [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])      
+
+
   viz
     .text_var("name")
     .id_var("id")
     .xaxis_var("distance")
-    .xaxis_domain(d3.extent(flat_data,function(d){return d.distance}))
+    .xaxis_domain(d3.extent(nested0,function(d){return d.distance}))
     .yaxis_var("complexity")
-    .yaxis_domain(d3.extent(flat_data,function(d){return d.complexity}).reverse())
+    .yaxis_domain(d3.extent(nested0,function(d){return d.complexity}).reverse())
     .value_var("val_usd")
     .tooltip_info(["distance", "complexity", "value"])
   
   d3.select("#viz")
-    .datum(nested)
+    .datum(nested0)
     .call(viz)
   
 })
@@ -540,7 +544,7 @@ d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(flat_da
     })
     
     // nest the flat data by nesting array
-    var nested2003 = vizwhiz.utils.nest(data2003, ["nesting_0"], true,
+    var nested2003 = vizwhiz.utils.nest(data2003, ["nesting_0","nesting_1","nesting_2"], true,
         [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
         
     console.log(nested2003);    

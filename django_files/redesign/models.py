@@ -33,7 +33,8 @@ class Country_manager(models.Manager):
 			"region_id",
 			"region__color",
 			"region__name",
-			"region__text_color"
+			"region__text_color",
+      "continent"
 		))
 
 class Country(models.Model):
@@ -156,6 +157,7 @@ class Sitc4(models.Model):
   name_pt = models.TextField(null=True) # Portuguese
   name_tr = models.TextField(null=True) # Turkish
   name_zh_cn = models.TextField(null=True) # Simplified Chinese
+  color = models.TextField(null=True)
 
   def __unicode__(self):
     return self.code + self.name_en
@@ -271,7 +273,7 @@ class Hs4_Cepii(models.Model):
     iso = models.CharField(max_length=300, blank=True)
     product = models.CharField(max_length=765, blank=True)
     hs4 = models.IntegerField(null=True, blank=True)
-    rca = models.FloatField(null=True, blank=True)
+    rca_pop = models.FloatField(null=True, blank=True)
     present = models.IntegerField(null=True, blank=True)
     absent = models.IntegerField(null=True, blank=True)
     m_resid = models.FloatField(null=True, db_column='M_resid', blank=True) # Field name made lowercase.

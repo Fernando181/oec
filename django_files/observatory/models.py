@@ -30,11 +30,12 @@ class Country_manager(models.Manager):
 			"name",
 			"name_3char",
 			"name_2char",
+      "continent",
 			"region_id",
 			"region__color",
 			"region__name",
-			"region__text_color"
-		))
+			"region__text_color",
+    ))
 
 class Country(models.Model):
 	name = models.CharField(max_length=200)
