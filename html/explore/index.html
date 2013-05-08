@@ -869,8 +869,9 @@
   
   tree = function()
   {
-    viz = vizwhiz.viz.tree_map().height(503)
-  	 																.width(640)
+    
+    viz = vizwhiz.viz.tree_map().height($('#viz').height())
+  	 														//		.width(640)
   																	.name_array(["name"]);
       // Nesting defaults
       if (app_type == "casy" || app_type == "ccsy"){
