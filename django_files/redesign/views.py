@@ -66,12 +66,12 @@ def build(request, app_name, trade_flow, origin, destination, product, classific
 
 
 def api_casy(request, classification, trade_flow, origin, year):
+  # import time
+  # start = time.time()
   from redesign.models import *
   lang = "en"
   total_val={}
   #  Sanity Checks
-  # import time
-  # start = time.time()
   
   ## Country
   origin = get_country(origin)
@@ -82,12 +82,12 @@ def api_casy(request, classification, trade_flow, origin, year):
   years_available = sorted(get_years(classification))
   
   # Magic numbers for per-capita figures
-  magic = list(Country_Cy.objects.filter(country=origin.id).values('year','magic'))
+  # magic = list(Country_Cy.objects.filter(country=origin.id).values('year','magic'))
                                 #,year__range=(years_available[0],
                                 #             years_available[-1])).values('year',
                                 #                                          'magic')
-  m = {}
-  for i in magic: m[i['year']] = i['magic']
+  # m = {}
+  # for i in magic: m[i['year']] = i['magic']
   
   ## Clasification & Django Data Call
   if classification == "sitc4":
@@ -135,151 +135,6 @@ def api_casy(request, classification, trade_flow, origin, year):
             "import_value": e['import_value'],
             "export_rca":e['export_rca']} for e in fast]                        
   
-  #### Net Export
-  # if trade_flow == "net_export":
-#     # fast = list(raw.values('year',
-#     #                        'product',
-#     #                        'product__code',
-#     #                        'product__name_en',
-#     #                        'export_value',
-#     #                        'import_value',
-#     #                        'export_rca'
-#     #                        ))
-#     fast = list(raw.values('year',
-#                             'country_id__name_3char',
-#                             'product_id',
-#                             'product_id__name',
-#                             'product_id__name_en',
-#                             'product_id__code',
-#                             'product_id__community_id',
-#                             'product_id__community_id__name',
-#                             'product_id__community_id__color',
-#                             'distance',
-#                             'export_rca',
-#                             'export_value',
-#                             'import_value'))                           
-#     # Remove invalid
-#     fast = [x for x in fast if x['export_value'] - x['import_value'] > 0]
-#      # Add net index for convenince  
-#     for x in fast: 
-#       x['net'] = x['export_value'] - x['import_value']
-#       
-#     build = [{"year":e['year'],
-#               "country":e['country_id__name_3char'],
-#               "id":e['product_id'],
-#               "name":e['product_id__name_en'], 
-#               "code":e['product_id__code'],
-#               "community_id":e['product_id__community_id'],
-#               "community_name":e['product_id__community_id__name'],
-#               "color":e['product_id__community_id__color'],
-#               "distance":e['distance'],
-#               "value":e['net'],
-#               "export_rca":e['export_rca']} for e in fast]    
-#     # build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-#     #           "name":e['product__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
-#   
-#   ####  Net Import
-#   elif trade_flow == "net_import":
-#     # fast = list(raw.values('year','product','product__code','product__name_en',
-#     #               'export_value','import_value','export_rca'))
-#     #               
-#                   
-#     fast = list(raw.values('year',
-#                             'country_id__name_3char',
-#                             'product_id',
-#                             'product_id__name',
-#                             'product_id__name_en',
-#                             'product_id__code',
-#                             'product_id__community_id',
-#                             'product_id__community_id__name',
-#                             'product_id__community_id__color',
-#                             'distance',
-#                             'export_rca',
-#                             'export_value',
-#                             'import_value'))              
-#     # Remove invalid
-#     fast = [x for x in fast if x['import_value'] - x['export_value'] > 0]
-#      # Add net index for convenince  
-#     for x in fast: 
-#       x['net'] = x['import_value'] - x['export_value']
-#     
-#     build = [{"year":e['year'],
-#               "country":e['country_id__name_3char'],
-#               "id":e['product_id'],
-#               "name":e['product_id__name_en'], 
-#               "code":e['product_id__code'],
-#               "community_id":e['product_id__community_id'],
-#               "community_name":e['product_id__community_id__name'],
-#               "color":e['product_id__community_id__color'],
-#               "distance":e['distance'],
-#               "value":e['net'],
-#               "export_rca":e['export_rca']} for e in fast]
-#               
-#     # build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-# #               "name":e['product__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
-#     
-#   ####  Export
-#   elif trade_flow == "export":
-#     exp = raw.filter(export_value__gt=0)
-#     
-#     fast = raw.values('year',
-#                       'country_id__name_3char',
-#                       'product_id',
-#                       'product_id__name',
-#                       'product_id__name_en',
-#                       'product_id__code',
-#                       'product_id__community_id',
-#                       'product_id__community_id__name',
-#                       'product_id__community_id__color',
-#                       'distance',
-#                       'export_rca',
-#                       'export_value')
-#               
-#     build = [{"year":e['year'],
-#               "country":e['country_id__name_3char'],
-#               "id":e['product_id'],
-#               "name":e['product_id__name_en'], 
-#               "code":e['product_id__code'],
-#               "community_id":e['product_id__community_id'],
-#               "community_name":e['product_id__community_id__name'],
-#               "color":e['product_id__community_id__color'],
-#               "distance":e['distance'],
-#               "value":e['export_value'],
-#               "export_rca":e['export_rca']} for e in fast]
-#             
-#   #### Import
-#   else: 
-#     exp = raw.filter(import_value__gt=0)
-#     # fast = exp.values('year','product','product__code','product__name_en',
-#     #                   'import_value','export_rca')
-#     fast = raw.values('year',
-#                       'country_id__name_3char',
-#                       'product_id',
-#                       'product_id__name',
-#                       'product_id__name_en',
-#                       'product_id__code',
-#                       'product_id__community_id',
-#                       'product_id__community_id__name',
-#                       'product_id__community_id__color',
-#                       'distance',
-#                       'export_rca',
-#                       'import_value')
-#     
-#     build = [{"year":e['year'],
-#               "country":e['country_id__name_3char'],
-#               "id":e['product_id'],
-#               "name":e['product_id__name_en'], 
-#               "code":e['product_id__code'],
-#               "community_id":e['product_id__community_id'],
-#               "community_name":e['product_id__community_id__name'],
-#               "color":e['product_id__community_id__color'],
-#               "distance":e['distance'],
-#               "value":e['import_value'],
-#               "export_rca":e['export_rca']} for e in fast]                      
-
-    # build = [{"year":e['year'],"item_id":e['product'],"abbr":e['product__code'],
-#               "name":e['product__name_en'], "value":e['import_value'],"rca":e['export_rca']} for e in fast]    
-  
   # Set query params with our changes
   query_params = request.GET.copy()
   query_params["lang"] = lang
@@ -294,7 +149,7 @@ def api_casy(request, classification, trade_flow, origin, year):
   json_response["title"] = get_question("casy", trade_flow=trade_flow,origin=origin)
   #"What does %s %s?" % (origin.name, trade_flow.replace("_", " "))
   json_response["year"] = year
-  json_response["magic"] = m
+  # json_response["magic"] = m
   json_response["item_type"] = "product"
   json_response["app_type"] = "casy"
   json_response["other"] = query_params
@@ -304,6 +159,8 @@ def api_casy(request, classification, trade_flow, origin, year):
   return HttpResponse(json.dumps(json_response))   
       
 def api_sapy(request, classification, trade_flow, product, year):
+  # import time
+  # start = time.time()
   from redesign.models import *
   lang = "en"
   total_val = {}
@@ -369,53 +226,6 @@ def api_sapy(request, classification, trade_flow, product, year):
             "export_value":e['export_value'],
             "import_value": e['import_value'],
             "export_rca":e['export_rca']} for e in fast]
-  
-  #### Net Export
-  # if trade_flow == "net_export":
-#     
-#     fast = list(raw.values('year','country','country__name_3char','country__name_en',
-#                   'export_value','import_value','export_rca'))
-#     # Remove invalid
-#     fast = [x for x in fast if x['export_value'] - x['import_value'] > 0]
-#      # Add net index for convenince  
-#     for x in fast: 
-#       x['net'] = x['export_value'] - x['import_value']
-#     
-#     build = [{"year":e['year'],"item_id":e['country'],"abbr":e['country__name_3char'],
-#               "name":e['country__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
-#    
-#   ####  Net Import
-#   elif trade_flow == "net_import":
-#     fast = list(raw.values('year','country','country__name_3char','country__name_en',
-#                   'export_value','import_value','export_rca'))
-#     # Remove invalid
-#     fast = [x for x in fast if x['import_value'] - x['export_value'] > 0]
-#      # Add net index for convenince  
-#     for x in fast: 
-#       x['net'] = x['import_value'] - x['export_value']
-#     
-#     build = [{"year":e['year'],"item_id":e['country'],"abbr":e['country__name_3char'],
-#               "name":e['country__name_en'], "value":e['net'],"rca":e['export_rca']} for e in fast]
-#    
-#   ####  Export
-#   elif trade_flow == "export":
-#     exp = raw.filter(export_value__gt=0)
-#     
-#     fast = exp.values('year','country','country__name_3char','country__name_en',
-#                       'export_value','export_rca')
-#     
-#     build = [{"year":e['year'],"item_id":e['country'],"abbr":e['country__name_3char'],
-#               "name":e['country__name_en'], "value":e['export_value'],"rca":e['export_rca']} for e in fast]  
-#     
-#   #### Import
-#   else:
-#   
-#     exp = raw.filter(import_value__gt=0)
-#     fast = exp.values('year','country','country__name_3char','country__name_en',
-#                       'import_value','export_rca')
-#     
-#     build = [{"year":e['year'],"item_id":e['country'],"abbr":e['country__name_3char'],
-#               "name":e['country__name_en'], "value":e['import_value'],"rca":e['export_rca']} for e in fast]
     
   # Set query params with our changes
   query_params = request.GET.copy()
@@ -436,10 +246,12 @@ def api_sapy(request, classification, trade_flow, product, year):
   json_response["app_type"] = "sapy"
   json_response["other"] = query_params   
   
+  # raise Exception(time.time() - start)  
   # Return to browser as JSON for AJAX request
   return HttpResponse(json.dumps(json_response))         
   
 def api_csay(request, classification, trade_flow, origin, year):
+  from redesign.models import *
   lang = "en"
   #  Sanity Checks
 
@@ -860,6 +672,8 @@ def stack(request,origin,year,classification="hs4"):
   years = year.split('.')  
   year_start = years[0]
   year_end = years[1]
+  
+  
   
   # Return page without visualization data
   return render_to_response("stack_local.html", {

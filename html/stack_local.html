@@ -460,17 +460,19 @@
 <script src="/media/js/libs/vizwiz/src/utils.js"></script>
 <script src="/media/js/libs/vizwiz/src/tooltip.js"></script>
 <script src="/media/js/libs/vizwiz/src/viz/stacked.js"></script>
+<script src="/media/js/libs/vizwiz/src/viz/viz.js"></script>
 
 <script>
 
-
-var viz = vizwhiz.viz.stacked().height(520).width(640).margin({top: 10, right: 40, bottom: 75, left: 80})
+d3.select('#viz').style('height','590px');
+var viz = vizwhiz.viz().height(590).width(640).type("stacked")//.margin({"top": 20, "right": 40, "bottom": 80, "left": 90}).type("stacked")
   //.nesting(["nesting_1","nesting_0"])
-  .xaxis_var("year")
-  .value_var("val_usd")
+  .xaxis_var(["year","Year"])
+  .value_var(["val_usd","Value (USD)"])
   //.title("Title of the chart")
   .tooltip_info(["id", "complexity", "distance"])
   .text_var("name")
+  // .small(true)
   .id_var("id");
 
 var attr,flat_data,complexity;
@@ -478,7 +480,7 @@ var attr,flat_data,complexity;
 	d3.json("/redesign/api/complex/{{origin.name_3char}}/{{year}}", function(raw){
 		var x = "{{year_end}}"
 		console.log(x);
-    years = d3.range("{{year_start}}",parseInt("{{year_end}}")+1)
+    years = d3.range("{{year_start}}",parseInt("{{year_end}}"))
 		data = []
 		attr = raw["attr"];
     flat_data = raw["data"];

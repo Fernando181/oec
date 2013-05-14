@@ -570,6 +570,13 @@ text-decoration: none;
   width: 640px;
   z-index: 10;
 }
+
+.app #main #content #viz {
+  height: 380px;
+  border-bottom: 1px solid #cccccc;
+  position: relative;
+}
+
 .app #main #content #dataviz {
   height: 380px;
   border-bottom: 1px solid #cccccc;
@@ -698,7 +705,7 @@ text-decoration: none;
 
 .app #loader {
   clear: both;
-  display: none;
+  display: block;
   height: 0;
   width: 640px;
   text-align: center;

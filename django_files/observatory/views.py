@@ -128,8 +128,11 @@ def download(request):
   except:
     pass
   import csv
+  raise Exception(request.POST)
   content = request.POST.get("content")
+  
   title = request.POST.get("title")
+  
   format = request.POST.get("format")
   
   if format == "svg" or format == "pdf" or format == "png":
@@ -309,7 +312,7 @@ def app_redirect(request, app_name, trade_flow, filter, year):
   # raise Exception("/explore/%s/%s/%s/%s/%s/%s/" % (app_name, trade_flow, country1, country2, product, year))
   return HttpResponsePermanentRedirect("/explore/%s/%s/%s/%s/%s/%s/" % (app_name, trade_flow, country1, country2, product, year))
 
-def explore(request, app_name, trade_flow, country1, country2, product, year="2009"):
+def explore(request, app_name, trade_flow, country1, country2, product, year="2010"):
   # raise Exception(country1, country2, product, year)
   # Get URL query parameters
   was_redirected = request.GET.get("redirect", False)
@@ -385,14 +388,17 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   country_code = None
   if country1 != "show" and country1 != "all": country_code = country1
   
-  if crawler == "":
-    view, args, kwargs = resolve("/api/%s/%s/%s/%s/%s/" % (trade_flow, country1, country2, product, year))
-    kwargs['request'] = request
-    view_response = view(*args, **kwargs)
-    data_as_text["data"] = view_response[0]
-    data_as_text["total_value"] = view_response[1]
-    data_as_text["columns"] = view_response[2]
+  
+  # if crawler == "":
+  # view, args, kwargs = resolve("/api/%s/%s/%s/%s/%s/" % (trade_flow, country1, country2, product, year))
+  # kwargs['request'] = request
+  # view_response = view(*args, **kwargs)
+  # raise Exception(view_response)
+  # data_as_text["data"] = view_response[0]
+  # data_as_text["total_value"] = view_response[1]
+  # data_as_text["columns"] = view_response[2]
 
+  
   app_type = get_app_type(country1, country2, product, year)
 
   # first check for errors
@@ -494,6 +500,8 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
 
 '''<COUNTRY> / all / show / <YEAR>'''
 def api_casy(request, trade_flow, country1, year):
+  # import time
+  # start = time.time()
   
   '''Init variables'''
   prod_class = request.session['product_classification'] if 'product_classification' in request.session else "hs4"
@@ -581,6 +589,7 @@ def api_casy(request, trade_flow, country1, year):
   json_response["year"] = year
   json_response["item_type"] = "product"
   json_response["other"] = query_params
+  # raise Exception(time.time() - start)
   """Return to browser as JSON for AJAX request"""
   return HttpResponse(json.dumps(json_response))
 
@@ -669,7 +678,7 @@ def api_sapy(request, trade_flow, product, year):
   json_response["year"] = year
   json_response["item_type"] = "country"
   json_response["other"] = query_params  
-  
+  # raise Exception(time.time() - start)
   """Return to browser as JSON for AJAX request"""
   return HttpResponse(json.dumps(json_response))
 
@@ -769,6 +778,8 @@ def api_csay(request, trade_flow, country1, year):
   return HttpResponse(json.dumps(json_response))
 
 def api_ccsy(request, trade_flow, country1, country2, year):
+  # import time
+  # start = time.time()
   '''Init variables'''
   prod_class = request.session['product_classification'] if 'product_classification' in request.session else "hs4"
   prod_class = request.GET.get("prod_class", prod_class)

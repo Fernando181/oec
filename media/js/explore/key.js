@@ -39,10 +39,8 @@ function Key() {
   function pretty_cats(attrs){
     cats = {}
     d3.values(attrs).forEach(function(d){
-      
       cats[d.category_id] = {}
       d3.keys(d).forEach(function(dd){
-      
         if(dd.indexOf("category") > -1){
           cats[d.category_id][dd.replace("category_", "")] = d[dd]
         }
@@ -98,10 +96,12 @@ function Key() {
       })
     a.on("click", function(d){
       // If this node is already selected, return to unsorted
+      console.log(d3.select(this))
       if (d3.select(this).attr("active") == "true")
       {
         d3.select("#viz").call(viz.solo([]));
         d3.select(this).attr("active","false");
+        d3.selectAll("."+d.continent).attr("active","false");
         d3.selectAll(".key a").style("opacity","1")
                               .style("pointer-events","auto")  
                               .style("cursor","");    
@@ -124,7 +124,9 @@ function Key() {
                                    .style("pointer-events","auto")  
                                    .style("cursor","")                 
                                    .attr("active","true"); 
-          d3.select("#viz").call(viz.solo([d.continent]));
+          
+          app_name=="stacked" ? stack_solo_filter(d.continent) : d3.select("#viz").call(viz.solo([d.continent]));
+          // d3.select("#viz").call(viz.solo([d.continent]));
         }
         // or we can simply filter by product community name
         else 
@@ -133,7 +135,9 @@ function Key() {
                          .style("pointer-events","auto")  
                          .style("cursor","")                 
                          .attr("active","true"); 
-          d3.select("#viz").call(viz.solo([d.name]));  
+                         
+          app_name=="stacked" ? stack_solo_filter(d.name) : d3.select("#viz").call(viz.solo([d.name]));
+          
         }              
                        
       }
@@ -149,6 +153,7 @@ function Key() {
      
   }
   
+  
   // HELPER FUNCTION to shorten names so they fit on one line
   // totally for aesthetics braaaaaa....
   function name(long_name){
@@ -163,6 +168,26 @@ function Key() {
     return short_name;
   }
   
+  function stack_solo_filter(name){
+      var nest_level = ($("#nesting_level").val());
+      var use_this
+      if (nest_level == "nest0"){ 
+        use_this = data_nest0 
+      } else if(nest_level == "nest1"){ 
+        use_this = data_nest1  
+      } else { 
+        use_this = data_nest2 } 
+        
+      var solos = []
+      use_this.forEach(function(d){
+        if (d.nesting_0.name == name){
+         solos.push(d.name)
+       } 
+      });
+      unq = solos.getUnique();
+      console.log(unq)
+      d3.select("#viz").call(viz.solo(unq));  
+  }
   ////////////////////////////////////////////
   // PUBLIC getter / setter functions
   ////////////////////////////////////////////
