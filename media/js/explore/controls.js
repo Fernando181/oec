@@ -8,6 +8,7 @@ function Controls() {
   function controls(selection) {
     selection.each(function(data, i) {
       
+      
       // Update year in title
       var year_title = ''+year;
       if(year_title.indexOf(".") > -1){
@@ -67,7 +68,7 @@ function Controls() {
           "rca": "RCA", "share": "Share", "value": "Value"}
       }
       // set attr_data for private funcitons to have access to
-      attr_data = data.attr_data;
+      attr_data = data.attr_data
       
       // Filter data to this only values with the year set to this year
       var years = [parseInt(year)]
