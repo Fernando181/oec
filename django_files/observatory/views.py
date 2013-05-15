@@ -389,14 +389,14 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   if country1 != "show" and country1 != "all": country_code = country1
   
   
-  # if crawler == "":
-  # view, args, kwargs = resolve("/api/%s/%s/%s/%s/%s/" % (trade_flow, country1, country2, product, year))
-  # kwargs['request'] = request
-  # view_response = view(*args, **kwargs)
-  # raise Exception(view_response)
-  # data_as_text["data"] = view_response[0]
-  # data_as_text["total_value"] = view_response[1]
-  # data_as_text["columns"] = view_response[2]
+  if crawler == "":
+    view, args, kwargs = resolve("/api/%s/%s/%s/%s/%s/" % (trade_flow, country1, country2, product, year))
+    kwargs['request'] = request
+    view_response = view(*args, **kwargs)
+    raise Exception(view_response)
+    data_as_text["data"] = view_response[0]
+    data_as_text["total_value"] = view_response[1]
+    data_as_text["columns"] = view_response[2]
 
   
   app_type = get_app_type(country1, country2, product, year)
@@ -516,6 +516,19 @@ def api_casy(request, trade_flow, country1, year):
   query_params["lang"] = lang
   query_params["product_classification"] = prod_class
   
+  '''Grab extraneous details'''
+  ## Clasification & Django Data Call
+  if prod_class == "sitc4":
+    attr_list = list(Sitc4.objects.all().values('code','name','color')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    
+  elif prod_class == "hs4":
+    attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    
+  # Get attribute information
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
+  
   '''Define parameters for query'''
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -532,12 +545,12 @@ def api_casy(request, trade_flow, country1, year):
   
   """Create query [year, id, abbrv, name_lang, val, export_rca]"""
   q = """
-    SELECT year, p.id, p.code, p.name_%s, %s, %s 
-    FROM observatory_%s_cpy as cpy, observatory_%s as p 
-    WHERE country_id=%s and cpy.product_id = p.id %s
+    SELECT year, p.id, p.code, p.name_%s, p.community_id, c.color,c.name, %s, %s
+    FROM observatory_%s_cpy as cpy, observatory_%s as p, observatory_%s_community as c 
+    WHERE country_id=%s and cpy.product_id = p.id %s and p.community_id = c.id
     HAVING val > 0
     ORDER BY val DESC
-    """ % (lang, val_col, rca_col, prod_class, prod_class, country1.id, year_where)
+    """ % (lang, val_col, rca_col, prod_class, prod_class, prod_class, country1.id, year_where)
   
   """Prepare JSON response"""
   json_response = {}
@@ -575,19 +588,23 @@ def api_casy(request, trade_flow, country1, year):
     
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[8], "share": (r[7] / total_val)*100,
+             "community_id": r[4], "color": r[5], "community_name":r[6], "code":r[2], "id": r[2]} for r in rows]
     
     
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
     
     json_response["data"] = rows 
-  
+    
+  json_response["attr"] = attr
   json_response["attr_data"] = Sitc4.objects.get_all(lang) if prod_class == "sitc4" else Hs4.objects.get_all(lang)
   json_response["country1"] = country1.to_json()
   json_response["title"] = "What does %s %s?" % (country1.name, trade_flow.replace("_", " "))
   json_response["year"] = year
   json_response["item_type"] = "product"
+  json_response["app_type"] = "casy"
+  json_response["class"] =  prod_class
   json_response["other"] = query_params
   # raise Exception(time.time() - start)
   """Return to browser as JSON for AJAX request"""
@@ -607,6 +624,31 @@ def api_sapy(request, trade_flow, product, year):
   query_params["lang"] = lang
   query_params["product_classification"] = prod_class
   
+  '''Grab extraneous details'''
+  ## Clasification & Django Data Call
+  if prod_class == "sitc4":
+    attr_list = list(Sitc4.objects.all().values('code','name','color')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    
+  elif prod_class == "hs4":
+    attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    
+  # Create dictiontary with product codes
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
+    
+  # Create dictionary of region codes  
+  region_list = list(Country_region.objects.all().values()) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  region = {}
+  for i in region_list: 
+    region[i['id']] = i  
+  
+  # Create dictinoary for continent groupings
+  continent_list = list(Country.objects.all().distinct().values('continent'))
+  continents = {}
+  for i,k in enumerate(continent_list): 
+     continents[k['continent']] = i*1000  
+  
   """Define parameters for query"""
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -623,7 +665,7 @@ def api_sapy(request, trade_flow, product, year):
 
   """Create query [year, id, abbrv, name_lang, val, export_rca]"""
   q = """
-    SELECT year, c.id, c.name_3char, c.name_%s, %s, %s 
+    SELECT year, c.id, c.name_3char, c.name_%s, c.region_id, c.continent, %s, %s 
     FROM observatory_%s_cpy as cpy, observatory_country as c 
     WHERE product_id=%s and cpy.country_id = c.id %s
     HAVING val > 0
@@ -661,11 +703,12 @@ def api_sapy(request, trade_flow, product, year):
     
   else:
     rows = raw_q(query=q, params=None)
-    total_val = sum([r[4] for r in rows])
+    total_val = sum([r[6] for r in rows])
     
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100,
+             "id": r[1]*10000, "region_id":r[4],"continent":r[5]} for r in rows]
   
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
@@ -677,6 +720,10 @@ def api_sapy(request, trade_flow, product, year):
   json_response["title"] = "Who %ss %s?" % (trade_flow.replace("_", " "), product.name_en)
   json_response["year"] = year
   json_response["item_type"] = "country"
+  json_response["app_type"] = "sapy"
+  json_response["attr"] = attr
+  json_response["region"]= region
+  json_response["continents"] = continents
   json_response["other"] = query_params  
   # raise Exception(time.time() - start)
   """Return to browser as JSON for AJAX request"""
@@ -696,6 +743,17 @@ def api_csay(request, trade_flow, country1, year):
   query_params["lang"] = lang
   query_params["product_classification"] = prod_class
   
+  '''Grab extraneous details'''
+  region_list = list(Country_region.objects.all().values()) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  region = {}
+  for i in region_list: 
+    region[i['id']] = i
+    
+  continent_list = list(Country.objects.all().distinct().values('continent'))
+  continents = {}
+  for i,k in enumerate(continent_list): 
+     continents[k['continent']] = i*1000
+  
   """Define parameters for query"""
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -710,7 +768,7 @@ def api_csay(request, trade_flow, country1, year):
 
   '''Create query [year, id, abbrv, name_lang, val, rca]'''
   q = """
-    SELECT year, c.id, c.name_3char, c.name_%s, %s, %s 
+    SELECT year, c.id, c.name_3char, c.name_%s, c.region_id, c.continent, %s, %s
     FROM observatory_%s_ccpy as ccpy, observatory_country as c 
     WHERE origin_id=%s and ccpy.destination_id = c.id %s
     GROUP BY year, destination_id
@@ -752,11 +810,12 @@ def api_csay(request, trade_flow, country1, year):
   
   else:
     rows = raw_q(query=q, params=None)
-    total_val = sum([r[4] for r in rows])
+    total_val = sum([r[6] for r in rows])
   
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100,
+             "id":r[1], "region_id":r[4], "continent":r[5]} for r in rows]
   
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
@@ -772,6 +831,10 @@ def api_csay(request, trade_flow, country1, year):
   json_response["title"] = "Where does %s %s %s?" % (country1.name, trade_flow, article)
   json_response["year"] = year
   json_response["item_type"] = "country"
+  json_response["app_type"] = "csay"
+  json_response["region"]= region
+  json_response["continents"]= continents
+  json_response["class"] =  prod_class
   json_response["other"] = query_params
     
   """Return to browser as JSON for AJAX request"""
@@ -795,6 +858,17 @@ def api_ccsy(request, trade_flow, country1, country2, year):
   query_params["lang"] = lang
   query_params["product_classification"] = prod_class
   
+  '''Grab extraneous details'''
+  if prod_class == "sitc4":
+    attr_list = list(Sitc4.objects.all().values('code','name','color')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  elif prod_class == "hs4":
+    attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  
+  attr = {}
+  for i in attr_list: 
+    attr[i['code']] = i
+  
+  
   '''Define parameters for query'''
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -809,12 +883,12 @@ def api_ccsy(request, trade_flow, country1, country2, year):
     
   '''Create query'''
   q = """
-    SELECT year, p.id, p.code, p.name_%s, %s, %s 
-    FROM observatory_%s_ccpy as ccpy, observatory_%s as p 
-    WHERE origin_id=%s and destination_id=%s and ccpy.product_id = p.id %s
+    SELECT year, p.id, p.code, p.name_%s, p.community_id, c.name, c.color, %s, %s 
+    FROM observatory_%s_ccpy as ccpy, observatory_%s as p, observatory_%s_community as c 
+    WHERE origin_id=%s and destination_id=%s and ccpy.product_id = p.id and p.community_id = c.id %s
     HAVING val > 0
     ORDER BY val DESC
-    """ % (lang, val_col, rca_col, prod_class, prod_class, country1.id, country2.id, year_where)
+    """ % (lang, val_col, rca_col, prod_class, prod_class, prod_class, country1.id, country2.id, year_where)
   
   """Prepare JSON response"""
   json_response = {}
@@ -847,11 +921,12 @@ def api_ccsy(request, trade_flow, country1, country2, year):
     
   else:
     rows = raw_q(query=q, params=None)
-    total_val = sum([r[4] for r in rows])
+    total_val = sum([r[7] for r in rows])
   
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[5], "share": (r[7] / total_val)*100,
+             "community_id":r[4],"community_name":r[5],"color":r[6], "code":r[2], "id": r[2]} for r in rows]
   
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
@@ -864,6 +939,9 @@ def api_ccsy(request, trade_flow, country1, country2, year):
   json_response["title"] = "What does %s %s %s %s?" % (country1.name, trade_flow, article, country2.name)
   json_response["year"] = year
   json_response["item_type"] = "product"
+  json_response["app_type"] = "ccsy"
+  json_response["attr"] = attr
+  json_response["class"] =  prod_class
   json_response["other"] = query_params
 
   """Return to browser as JSON for AJAX request"""
@@ -885,6 +963,17 @@ def api_cspy(request, trade_flow, country1, product, year):
   query_params["lang"] = lang
   query_params["product_classification"] = prod_class
   
+  '''Grab extraneous details'''
+  region_list = list(Country_region.objects.all().values()) #.extra(where=['CHAR_LENGTH(code) = 2'])
+  region = {}
+  for i in region_list: 
+    region[i['id']] = i
+    
+  continent_list = list(Country.objects.all().distinct().values('continent'))
+  continents = {}
+  for i,k in enumerate(continent_list): 
+     continents[k['continent']] = i*1000
+  
   '''Define parameters for query'''
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -899,7 +988,7 @@ def api_cspy(request, trade_flow, country1, product, year):
     
   '''Create query'''
   q = """
-    SELECT year, c.id, c.name_3char, c.name_%s, %s, %s 
+    SELECT year, c.id, c.name_3char, c.name_%s, c.region_id, c.continent, %s, %s 
     FROM observatory_%s_ccpy as ccpy, observatory_country as c 
     WHERE origin_id=%s and ccpy.product_id=%s and ccpy.destination_id = c.id %s
     GROUP BY year, destination_id
@@ -918,10 +1007,12 @@ def api_cspy(request, trade_flow, country1, product, year):
     cache_query = raw.hget(key, 'data')
     if (cache_query == None):
       rows = raw_q(query=q, params=None)
-      total_val = sum([r[4] for r in rows])
+      total_val = sum([r[6] for r in rows])
       """Add percentage value to return vals"""
-      rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
-  
+      #rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100} for r in rows]
+      rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100,
+               "region_id": r[4], "continent": r[5], "id":r[1]} for r in rows]
+               
       if crawler == "":
         return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]] 
       
@@ -938,11 +1029,12 @@ def api_cspy(request, trade_flow, country1, product, year):
   
   else:
     rows = raw_q(query=q, params=None)
-    total_val = sum([r[4] for r in rows])
+    total_val = sum([r[6] for r in rows])
   
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[4], "rca":r[5], "share": (r[4] / total_val)*100} for r in rows]
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100,
+             "region_id": r[4], "continent": r[5], "id":r[1]} for r in rows]
   
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
@@ -958,6 +1050,10 @@ def api_cspy(request, trade_flow, country1, product, year):
   json_response["product"] = product.to_json()
   json_response["year"] = year
   json_response["item_type"] = "country"
+  json_response["continents"]= continents
+  json_response["region"]= region
+  json_response["app_type"] = "cspy"
+  json_response["class"] =  prod_class
   json_response["other"] = query_params
   
   '''Return to browser as JSON for AJAX request'''

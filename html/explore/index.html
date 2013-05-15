@@ -841,13 +841,13 @@
     if (app_type == "casy" || app_type == "sapy" || app_type == "ccsy")
     {
       
-      sort_flat(flat); 
+      // sort_flat(flat); 
       
       if (app_type == "casy" || app_type=="ccsy")
       {
         
         where = flat.filter(function(d){ return d.community_id != undefined; })
-        
+        // where=flat
         // flat.map(function(d){
 //           if (d.community_id == undefined){
 //             d.community_id = 90;
@@ -856,7 +856,6 @@
 //           }
 //         })
         
-        // where=flat
         where.map(function(d,i){
           
           if (prod_class == "hs4")
@@ -866,9 +865,6 @@
           }
           else // sitc4 codes end in 00's
           {
-            if (d.code=="6784"){
-              console.log(d)
-            }
             d.color = attr[d.code.slice(0, 1)+"000"].color
             d.nesting_0 = {"name" :attr[d.code.slice(0, 1)+"000"].name, "id":d.code.slice(0, 1)};
             // d.nesting_0 = {"name" :d.community_name, "id":d.community_id};
@@ -1033,7 +1029,7 @@
   //
   // the sparkplug that drives my vizwiz engine
   //
-  d3.json(redesign_api_uri,function(raw)
+  d3.json(api_uri,function(raw)
   {
     rawData = raw;
     

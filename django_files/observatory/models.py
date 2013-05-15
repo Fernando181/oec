@@ -163,6 +163,7 @@ class Sitc4(models.Model):
 	name_pt = models.TextField(null=True) # Portuguese
 	name_tr = models.TextField(null=True) # Turkish
 	name_zh_cn = models.TextField(null=True) # Simplified Chinese
+	color = models.TextField(null=True)
 
 	def __unicode__(self):
 		return self.code + self.name_en
