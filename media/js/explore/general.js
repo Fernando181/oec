@@ -6,8 +6,7 @@ function build_app(api_uri, type_of_app, dimensions, embed){
   
   // get data from server
   d3.json(api_uri, function(data){
-		
-		// build the app with data from server
+    // build the app with data from server
     build(data, dimensions)
     // hide loading icon
     d3.select("#loader").style("display", "none");
@@ -19,7 +18,7 @@ function build_app(api_uri, type_of_app, dimensions, embed){
     // clean up attribute data
     data.attr_data = clean_attr_data(data.attr_data)
     var showing = data.item_type;
-   
+    
     // initialize the app (build it for the first time)
     app = App()
       .width(dimensions[0])
@@ -68,7 +67,7 @@ function clean_attr_data(attrs){
     var id_property = attr["community_id"] ? "community_id" : "region_id",
       name_property = attr["community__name"] ? "community__name" : "region__name",
       color_property = attr["community__color"] ? "community__color" : "region__color",
-      text_color_property = attr["community__text_color"] ? "community__text_color" : "region__text_color",
+      text_color_property = attr["community__text_color"] ? "community__text_color" : "region__text_color";
       continent_property = attr["continent"] ? "continent" : "";
     attr["category_id"] = attr[id_property]; delete attr[id_property];
     attr["category_name"] = attr[name_property]; delete attr[name_property];
