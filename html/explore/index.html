@@ -213,26 +213,7 @@
         
         <!-- the canvas for the visualization -->
         <div id="text_data">
-        {% if data_as_text %}
-          <table>
-            <tr>
-              {% for c in data_as_text.columns %}
-              <th>{{c}}</th>
-              {% endfor %}
-            </tr>
-            {% for d in data_as_text.data %}
-            <tr class="{% cycle 'even' 'odd' %}">
-              <td>{{forloop.counter}}</td>
-              <td>{{d.year}}</td>
-              <td>{{d.abbrv}}</td>
-              <td>{{d.name}}</td>
-              <td>${{d.val|floatformat:2|intcomma}}</td>
-              <td>{{d.rca|floatformat:-2}}</td>
-              <td>{{d.share|floatformat:-2}}%</td>
-            </tr>
-            {% endfor %}
-          </table>
-        {% else %}
+
         </div>
         
         <!-- Container for the visualization -->
@@ -242,15 +223,10 @@
         <div class="key"></div>
         
         <!-- Container for the timeline -->
-        <div id="timeline">
-          <div class="ui_bottom" id="ui_bottom" style="bottom:0px"></div>
-          <!-- <div class="slider" id="year"></div> -->
-          <!-- {% if app_name != "stacked" %}
-          <a class="prev" href="/explore/{{app_name}}/{{trade_flow}}/{% if country1.name_3char %}{{country1.name_3char|lower}}{% else %}{{country1}}{% endif %}/{% if country2.name_3char %}{{country2.name_3char|lower}}{% else %}{{country2}}{% endif %}/{% if product.code %}{{product.code}}{% else %}{{product}}{% endif %}/{% if year > years_available.0 %}{{year|add:-1}}{% else %}{{years_available.last}}{% endif %}/">&laquo; {% trans "Previous" %}</a>
-            <button id="play">{% trans "Play" %}</button>
-            <button id="stop">{% trans "Stop" %}</button>
-          <a class="next" href="/explore/{{app_name}}/{{trade_flow}}/{% if country1.name_3char %}{{country1.name_3char|lower}}{% else %}{{country1}}{% endif %}/{% if country2.name_3char %}{{country2.name_3char|lower}}{% else %}{{country2}}{% endif %}/{% if product.code %}{{product.code}}{% else %}{{product}}{% endif %}/{% if year < years_available.last %}{{year|add:1}}{% else %}{{years_available.0}}{% endif %}/">{% trans "Next" %} &raquo;</a>
-          {% else %}
+         <div id="timeline">
+          <div class="ui_bottom" id="ui_bottom" style="bottom:0px">
+          </div>
+          {% if app_name == "stacked" %}  
           <div id="stacked_controls">
             <div>
               <p>Year Interval: </p>
@@ -279,12 +255,12 @@
               <input type="radio" id="per" name="capita" /><label for="per">Per Capita</label>
             </div>
             {% endif %}
-          </div>
-          {% endif %} -->
-        </div>
-        {% endif %}
-
-      </div> <!-- END content -->
+          </div>  
+          {% endif %}
+         
+         </div>  
+           
+      </div><!-- END content -->
       
       <!-- the right pane -->
       <div id="tool_pane">
@@ -661,13 +637,15 @@
       case "stacked":
         // Use stack_nesting 
         if (nest_level == "nest0") {
-          set_stack_nesting(data_nest0);
+          (app_type=="csay"||app_type=="ccsy"||app_type=="sapy") ?
+            set_stack_nesting(nest1_value) :
+            set_stack_nesting(nest0_value);  
         }
         else if (nest_level == "nest1"){
-          set_stack_nesting(data_nest1);
+          set_stack_nesting(nest1_value);
         }
         else {
-          set_stack_nesting(data_nest2);
+          set_stack_nesting(nest2_value);
         }
         break;
     }
@@ -694,11 +672,32 @@
     // d3.sum(current, function(d){ return d["value"] })
   }     
   
-  set_stack_nesting = function(arg){
+  set_stack_nesting = function(arg)
+  {
+    // In order to remain in a filter while altering nesting levels 
+    // we need to search by category filter a second time
+    filtered = d3.select("[active=true]")
+    
+    if (filtered[0][0]!=null){
+      filter_by = filtered[0][0].title
+      d3.select("#viz").call(viz.solo([]))
+      
+      d3.select("#viz")
+        .datum(arg)
+        .call(viz)
         
-        d3.select("#viz")
-          .datum(arg)
-          .call(viz)
+      stack_solo_filter(filter_by);  
+      
+    }
+    
+    else
+    {
+      d3.select("#viz")
+        .datum(arg)
+        .call(viz)
+    }
+        
+      
   }
   
   set_tree_nesting = function(arg) 
@@ -757,7 +756,45 @@
         .datum(arg)
         .call(viz);
   }  
-      
+  
+  set_stack_layout = function(arg){
+
+    if (arg=="share"){
+      // set_stack_nesting(nest0_val);
+      d3.select("#viz").call(viz.layout("share"));
+      d3.select("#viz").call(viz.value_var(["my_share","Share"]));
+    } 
+    else
+    {
+      // set_stack_nesting(nest0_value);
+      d3.select("#viz").call(viz.layout("value"));
+      d3.select("#viz").call(viz.value_var(["value","Value (USD)"]));
+    } 
+  }
+  
+  stack_solo_filter = function(name){
+      var nest_level = ($("#nesting_level").val());
+      var use_this
+      if (nest_level == "nest0"){
+        //if we're display countries sort by 2nd tier 
+        (app_type=="csay"||app_type=="ccsy"||app_type=="sapy") ? 
+        use_this = nest1_value : use_this = nest0_value
+      } else if(nest_level == "nest1"){ 
+        use_this = nest1_value  
+      } else { 
+        use_this = nest2_value } 
+        
+      var solos = []
+      use_this.forEach(function(d){
+        if (d.nesting_0.name == name){
+         solos.push(d.name)
+       } 
+      });
+      unq = solos.getUnique();
+      console.log(unq)
+      d3.select("#viz").call(viz.solo(unq));  
+  }
+
   sort_flat = function(arg)
   {
       arg.forEach(function(d){ 
@@ -966,7 +1003,7 @@
   
   stack = function()
   {
-    
+    d3.select("#year_interval").style("display","none")
     d3.select('#viz').style('height','560px');
     viz = vizwhiz.viz().height(570).width(640).type("stacked")//.margin({"top": 20, "right": 40, "bottom": 80, "left": 90}).type("stacked")
       .xaxis_var(["year","Year"])
@@ -983,28 +1020,35 @@
    
         yearRange = d3.range(year_start,parseInt(year_end)+1)
         
-        data_nest0 = []
-        data_nest1 = []
-        data_nest2 = []
+        // GLOBAL VARIABLES..
+        // Data by value
+        nest0_value = []
+        nest1_value = []
+        nest2_value = []
          
         yearRange.forEach(function(entry) {
 
             var entryData = where.filter(function(d){return d.year == entry})
-            var nestedEntry0 = vizwhiz.utils.nest(entryData, ["nesting_0"], true,
-                [{"key":"value", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
-            var nestedEntry1 = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1"], true,
-                [{"key":"value", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
-            var nestedEntry2 = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1","nesting_2"], true,
-                [{"key":"value", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
+            entryData.map(function(g){
+              g.my_share = g.value / annual[g.year]
+            })
+              
+            var nestedEntry0_value = vizwhiz.utils.nest(entryData, ["nesting_0"], true,
+                [{"key":"my_share", "agg":"sum"}, {"key":"value", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
+            var nestedEntry1_value = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1"], true,
+                [{"key":"my_share", "agg":"sum"}, {"key":"value", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
+            var nestedEntry2_value = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1","nesting_2"], true,
+                [{"key":"my_share", "agg":"sum"}, {"key":"value", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);    
                 
-            data_nest0 = data_nest0.concat(nestedEntry0);  
-            data_nest1 = data_nest1.concat(nestedEntry1);  
-            data_nest2 = data_nest2.concat(nestedEntry2);  
+                
+            nest0_value = nest0_value.concat(nestedEntry0_value);  
+            nest1_value = nest1_value.concat(nestedEntry1_value);  
+            nest2_value = nest2_value.concat(nestedEntry2_value);  
             
         });
         
         d3.select("#loader").style("display", "none");
-        set_stack_nesting(data_nest2)
+        set_stack_nesting(nest2_value)
         
         key = Key()
           .classification(rawData.class)
@@ -1048,12 +1092,14 @@
     
     attr_data = clean_attr_data(attr_data)
     
+    get_totals();
+    
     if (app_name=="stacked"){
       construct_nest(flat_data)
       stack()
     } 
     
-    get_totals();
+    
      
     if (app_name=="tree_map"){
       flat_data = flat_data.filter(function(d){ return d.year == year; })

@@ -171,12 +171,14 @@ function Key() {
   function stack_solo_filter(name){
       var nest_level = ($("#nesting_level").val());
       var use_this
-      if (nest_level == "nest0"){ 
-        use_this = data_nest0 
+      if (nest_level == "nest0"){
+        //if we're display countries sort by 2nd tier 
+        (app_type=="csay"||app_type=="ccsy"||app_type=="sapy") ? 
+        use_this = nest1_value : use_this = nest0_value
       } else if(nest_level == "nest1"){ 
-        use_this = data_nest1  
+        use_this = nest1_value  
       } else { 
-        use_this = data_nest2 } 
+        use_this = nest2_value } 
         
       var solos = []
       use_this.forEach(function(d){

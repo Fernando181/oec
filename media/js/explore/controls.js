@@ -20,9 +20,9 @@ function Controls() {
       // Update year in dropdown
       if(app_type == "stacked"){
         var years = year.split(".").map(function(y){ return parseInt(y); });
-        years = d3.range(years[0], parseInt(years[1])+1, 1);
+        years = d3.range(years[0], years[1]+1, years[2]);
         $(".dropdown_container#year_start select").val(years[0]);
-        $(".dropdown_container#year_end select").val(years[years.length-1]);
+        // $(".dropdown_container#year_end select").val(years[years.length-1]);
         $(".dropdown_container#year_interval select").val(years[1] - years[0]);
         $(".dropdown_container#year_start select").trigger("liszt:updated");
         $(".dropdown_container#year_end select").trigger("liszt:updated");

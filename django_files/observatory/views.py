@@ -584,8 +584,8 @@ def api_casy(request, trade_flow, country1, year):
   
   else:
     rows = raw_q(query=q, params=None)
-    total_val = sum([r[4] for r in rows])
-    
+    total_val = sum([r[7] for r in rows])
+    # raise Exception(q,r,(r[7]/total_val)*100)
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
     rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[8], "share": (r[7] / total_val)*100,
@@ -704,7 +704,7 @@ def api_sapy(request, trade_flow, product, year):
   else:
     rows = raw_q(query=q, params=None)
     total_val = sum([r[6] for r in rows])
-    
+    # raise Exception(total_val)
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
     rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100,
