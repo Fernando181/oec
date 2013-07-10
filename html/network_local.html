@@ -460,6 +460,7 @@
 <script src="/media/js/libs/vizwiz/src/utils.js"></script>
 <script src="/media/js/libs/vizwiz/src/tooltip.js"></script>
 <script src="/media/js/libs/vizwiz/src/viz/network.js"></script>
+<script src="/media/js/libs/vizwiz/src/viz/viz.js"></script>
 <script>
 
 //  d3.json("/media/js/libs/vizwiz/examples/data/attr_hs.json", function(attr) {
@@ -473,8 +474,8 @@
       flat_data = raw["data"];
       attr=raw["attr"];
       
-      flat_data = flat_data.filter(function(d){ return d.year == year })
-      
+      viz = vizwhiz.viz()
+      // flat_data = flat_data.filter(function(d){ return d.year == year })
       viz_nodes = hs.nodes
       viz_links = hs.edges
       
@@ -487,46 +488,85 @@
         link.target = viz_nodes[link.target]
       })
       
-      f_data = {}
-      viz_nodes.forEach(function(d){
-        f_data[d.id] = flat_data.filter(function(f){return f.code == d.id})[0]
-        f_data[d.id] = vizwhiz.utils.merge(f_data[d.id],attr[d.id])
-        //f_data[d.id].rca = get_rca(data[d.id])
-        f_data[d.id].active = f_data[d.id].rca >= 1 ? true : false
+    data = []
+    the_years = vizwhiz.utils.uniques(flat_data,"year")
+    the_years.forEach(function(year){
+      viz_nodes.forEach(function(n){
+        // console.log("N",n)
+        var d = flat_data.filter(function(p){ return p.year == year && p.code == n.id })[0]
+        // console.log("D:",d)
+        var obj = vizwhiz.utils.merge(d,attr[n.id])
+        // console.log("Obj:",obj)
+        obj.year = year;
+        
+        obj.x = n.x
+        obj.y = n.y
+        obj = vizwhiz.utils.merge(obj,n)
+        // obj.nesting_0 = {"name":attr[obj.id.slice(0, 2)].name, "id":obj.id.slice(0, 2)};
+        // obj.nesting_1 = {"name":attr[obj.id.slice(0, 4)].name, "id":obj.id.slice(0, 4)};
+        // obj.nesting_2 = {"name":attr[obj.id.slice(0, 6)].name, "id":obj.id.slice(0, 6)};
+        obj.active = Math.floor(Math.random()*2);
+        data.push(obj)
+        // f_data[d.id] = flat_data.filter(function(f){return f.code == d.id})[0]
+        // f_data[d.id] = vizwhiz.utils.merge(f_data[d.id],attr[d.id])
+        // f_data[d.id].rca = get_rca(data[d.id])
+        // f_data[d.id].active = f_data[d.id].rca >= 1 ? true : false
       })
+    })
+    
+    viz
+      .type("network")
+      .links(viz_links)
+      .width(640)
+      .height(520)
+      .value_var("value")
+      .name_array(["name"])
+      // .title("Product Space")
+      // .sub_title("Cool example of a sub-title")
+      .nesting(["nesting_0","nesting_1","nesting_2"])
+      .tooltip_info(["id","val_usd","val_quantity","val_kg","complexity","distance","rca"])
+      .total_bar({"prefix": "Export Value: $", "suffix": " USD", "format": ",f"})
+      .year(2010);
+    
+    d3.select('#viz').style('height','503px');
       
-      viz = vizwhiz.viz.network()
-        .width(640)
-        .height(520)
-        .nodes(viz_nodes)
-        .links(viz_links)
-        .value_var("val_usd")
-        .tooltip_info(["val_usd","complexity","distance","rca","code"]);
+    d3.select("#viz")
+      .datum(data)
+      .call(viz);  
+      
+    d3.select("#loader").style("display", "none");  
+      // viz = vizwhiz.viz.network()
+        // .width(640)
+        // .height(520)
+  //       .nodes(viz_nodes)
+  //       .links(viz_links)
+  //       .value_var("val_usd")
+  //       .tooltip_info(["val_usd","complexity","distance","rca","code"]);
         //.tooltip_info(["id","val_usd","val_quantity","val_kg","complexity","distance","rca"]);
         
-      d3.select("#viz")
-        .datum(f_data)
-        .call(viz);
-        
-      function get_rca(item){
-  
-        var rca_name = "val_usd", rca_denom = "bra"
-      
-        if (!item || !item[rca_name]) return 0
-
-        var numerator = item[rca_name] / d3.sum(ps_data,function(d){return d[rca_name]});
-        if(rca_denom == "bra"){
-          var denominator = item["bra_"+rca_name] / d3.sum(ps_data,function(d){return d["bra_"+rca_name]});
-        }
-        else {
-          var denominator = item["wld_"+rca_name] / d3.sum(ps_data,function(d){return d["wld_"+rca_name]});
-        }
-              
-        if(denominator != 0){
-          return numerator / denominator;
-        }
-        return 0;
-      }
+      // d3.select("#viz")
+      //   .datum(f_data)
+      //   .call(viz);
+      //   
+      // function get_rca(item){
+      //   
+      //   var rca_name = "val_usd", rca_denom = "bra"
+      // 
+      //   if (!item || !item[rca_name]) return 0
+      // 
+      //   var numerator = item[rca_name] / d3.sum(ps_data,function(d){return d[rca_name]});
+      //   if(rca_denom == "bra"){
+      //     var denominator = item["bra_"+rca_name] / d3.sum(ps_data,function(d){return d["bra_"+rca_name]});
+      //   }
+      //   else {
+      //     var denominator = item["wld_"+rca_name] / d3.sum(ps_data,function(d){return d["wld_"+rca_name]});
+      //   }
+      //         
+      //   if(denominator != 0){
+      //     return numerator / denominator;
+      //   }
+      //   return 0;
+      // }
   
       
     })

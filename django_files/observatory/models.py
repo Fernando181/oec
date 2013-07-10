@@ -81,6 +81,11 @@ class Cy(models.Model):
 	eci = models.FloatField(null=True)
 	eci_rank = models.PositiveSmallIntegerField(max_length=4)
 	oppvalue = models.FloatField(null=True)
+	leader = models.CharField(max_length=100, null=True)
+	magic = models.FloatField(null=True)
+	pc_constant = models.FloatField(null=True)
+	pc_current = models.FloatField(null=True)
+	notpc_constant = models.FloatField(null=True)
 
 	def __unicode__(self):
 		return "%s rank: %d" % (self.country.name, self.eci_rank)
@@ -121,7 +126,7 @@ class Sitc4_manager(models.Manager):
 	def get_all(self, lang):
 		
 		products = self.filter_lang(lang)
-		products = products.filter(community__isnull=False, ps_size__isnull=False)
+		products = products.filter(community__isnull=False)#, ps_size__isnull=False)
 		return list(products.values(
 			"id",
 			"name",
@@ -180,9 +185,21 @@ class Sitc4_py(models.Model):
 	year = models.PositiveSmallIntegerField(max_length=4)
 	pci = models.FloatField(null=True)
 	pci_rank = models.PositiveSmallIntegerField(max_length=4)
+	world_trade = models.FloatField(null=True)
 
 	def __unicode__(self):
 		return "%s rank: %d" % (self.product.name, self.pci_rank)
+
+class Hs4_py(models.Model):
+	product = models.ForeignKey(Sitc4)
+	year = models.PositiveSmallIntegerField(max_length=4)
+	pci = models.FloatField(null=True)
+	pci_rank = models.PositiveSmallIntegerField(max_length=4)
+	world_trade = models.FloatField(null=True)
+
+	def __unicode__(self):
+		return "%s rank: %d" % (self.product.name, self.pci_rank)
+
 
 # Colors for HS4 clusters 
 # http://www.foreign-trade.com/reference/hscode.htm
@@ -207,7 +224,7 @@ class Hs4_manager(models.Manager):
 
 	def get_all(self, lang):
 		products = self.filter_lang(lang)
-		products = products.filter(community__isnull=False, ps_size__isnull=False)
+		products = products.filter(community__isnull=False)#, ps_size__isnull=False)
 		return list(products.values(
 			"id",
 			"name",
@@ -333,6 +350,8 @@ class Sitc4_cpy(models.Model):
 	export_value = models.FloatField(null=True)
 	import_value = models.FloatField(null=True)
 	export_rca = models.FloatField(null=True)
+	distance = models.FloatField(null=True) 
+	opp_gain = models.FloatField(null=True)
 	
 	def __unicode__(self):
 		return "CPY: %s.%s.%d" % (self.country.name, self.product.code, self.year)
@@ -410,6 +429,8 @@ class Hs4_cpy(models.Model):
 	export_value = models.FloatField(null=True)
 	import_value = models.FloatField(null=True)
 	export_rca = models.FloatField(null=True)
+	distance = models.FloatField(null=True) 
+	opp_gain = models.FloatField(null=True)
 	
 	def __unicode__(self):
 		return "CPY: %s.%s.%d" % (self.country.name, self.product.code, self.year)

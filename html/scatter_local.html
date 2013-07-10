@@ -460,9 +460,10 @@
 <script src="/media/js/libs/vizwiz/src/utils.js"></script>
 <script src="/media/js/libs/vizwiz/src/tooltip.js"></script>
 <script src="/media/js/libs/vizwiz/src/viz/pie_scatter.js"></script>
+<script src="/media/js/libs/vizwiz/src/viz/viz.js"></script>
 <script>
-
-var viz = vizwhiz.viz.pie_scatter().height(520).width(640)
+var viz = vizwhiz.viz().height(503).width(640).type("pie_scatter")
+// var viz = vizwhiz.viz.pie_scatter().height(520).width(640)
 var flat_data,attr,complexity,
     year="{{year}}";
 
@@ -472,7 +473,7 @@ d3.json("/redesign/api/complex/{{origin.name_3char}}/{{year}}", function(raw){
   complexity= raw["complex"];
   flat_data=raw["data"];
   
-  flat_data = flat_data.filter(function(d){ return d.year == year; })
+  // flat_data = flat_data.filter(function(d){ return d.year == year; })
   
   flat_data.map(function(d){
     d.active = d.rca >=1 ? 1 : 0
@@ -484,70 +485,88 @@ d3.json("/redesign/api/complex/{{origin.name_3char}}/{{year}}", function(raw){
     
   })
  
-      nested2 = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1","nesting_2"], true,
-      [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
-      
-      nested1 = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1"], true,
-            [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
-            
-      nested0 = vizwhiz.utils.nest(flat_data, ["nesting_0"], true,
-            [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])      
+      // nested2 = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1","nesting_2"], true,
+ //      [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
+ //      
+ //      nested1 = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1"], true,
+ //            [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
+ //            
+ //      nested0 = vizwhiz.utils.nest(flat_data, ["nesting_0"], true,
+ //            [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])      
 
 
+  // viz
+  //   .text_var("name")
+  //   .id_var("id")
+  //   .xaxis_var("distance")
+  //   .xaxis_domain(d3.extent(nested0,function(d){return d.distance}))
+  //   .yaxis_var("complexity")
+  //   .yaxis_domain(d3.extent(nested0,function(d){return d.complexity}).reverse())
+  //   .value_var("val_usd")
+  //   .tooltip_info(["distance", "complexity", "value"])
   viz
+    .type("pie_scatter")
     .text_var("name")
     .id_var("id")
     .xaxis_var("distance")
-    .xaxis_domain(d3.extent(nested0,function(d){return d.distance}))
+    .xaxis_domain(d3.extent(flat_data,function(d){return d.distance}))
     .yaxis_var("complexity")
-    .yaxis_domain(d3.extent(nested0,function(d){return d.complexity}).reverse())
+    .yaxis_domain(d3.extent(flat_data,function(d){return d.complexity}).reverse())
     .value_var("val_usd")
-    .tooltip_info(["distance", "complexity", "value"])
+    .tooltip_info(["distance", "complexity", "val_usd", "rca"])
+    .total_bar({"prefix": "$", "suffix": " USD", "format": ",f"})
+    .nesting(["nesting_0","nesting_1","nesting_2"])
+    .nesting_aggs({"complexity":"mean","distance":"mean","rca":"mean"})
+    // .solo("Wood Products")
+    .depth("nesting_2")
+    .spotlight(false)
+    .year(2010)
+  
   
   d3.select("#viz")
-    .datum(nested0)
+    .datum(flat_data)
     .call(viz)
   
 })
 
-d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(flat_data){
-  d3.json("/media/js/libs/vizwiz/examples/data/attr_hs.json", function(attrs){
-
-    data2010 = flat_data.filter(function(d){
-      return d.year == 2010;
-    })
-    
-    data2010.map(function(d, i){
-      d.active = Math.floor(Math.random()*2);
-      d.nesting_0 = {"name":attrs[d.id.slice(0, 2)].name, "id":d.id.slice(0, 2)};
-      d.nesting_1 = {"name":attrs[d.id.slice(0, 4)].name, "id":d.id.slice(0, 4)};
-      d.nesting_2 = {"name":attrs[d.id.slice(0, 6)].name, "id":d.id.slice(0, 6)};
-      // d.value = d.val_usd;
-      data2010[i] = vizwhiz.utils.merge(d, attrs[d.id]);
-    })
-    
-    // nest the flat data by nesting array
-    var nested2010 = vizwhiz.utils.nest(data2010, ["nesting_0","nesting_1"], true,
-        [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
-
-    data2003 = flat_data.filter(function(d){
-      return d.year == 2003;
-    })
-
-    data2003.map(function(d, i){
-      d.active = Math.floor(Math.random()*2);
-      d.nesting_0 = {"name":attrs[d.id.slice(0, 2)].name, "id":d.id.slice(0, 2)};
-      d.nesting_1 = {"name":attrs[d.id.slice(0, 4)].name, "id":d.id.slice(0, 4)};
-      d.nesting_2 = {"name":attrs[d.id.slice(0, 6)].name, "id":d.id.slice(0, 6)};
-      // d.value = d.val_usd;
-      data2003[i] = vizwhiz.utils.merge(d, attrs[d.id]);
-    })
-    
-    // nest the flat data by nesting array
-    var nested2003 = vizwhiz.utils.nest(data2003, ["nesting_0","nesting_1","nesting_2"], true,
-        [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
-        
-    console.log(nested2003);    
+// d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(flat_data){
+//   d3.json("/media/js/libs/vizwiz/examples/data/attr_hs.json", function(attrs){
+// 
+//     data2010 = flat_data.filter(function(d){
+//       return d.year == 2010;
+//     })
+//     
+//     data2010.map(function(d, i){
+//       d.active = Math.floor(Math.random()*2);
+//       d.nesting_0 = {"name":attrs[d.id.slice(0, 2)].name, "id":d.id.slice(0, 2)};
+//       d.nesting_1 = {"name":attrs[d.id.slice(0, 4)].name, "id":d.id.slice(0, 4)};
+//       d.nesting_2 = {"name":attrs[d.id.slice(0, 6)].name, "id":d.id.slice(0, 6)};
+//       // d.value = d.val_usd;
+//       data2010[i] = vizwhiz.utils.merge(d, attrs[d.id]);
+//     })
+//     
+//     // nest the flat data by nesting array
+//     var nested2010 = vizwhiz.utils.nest(data2010, ["nesting_0","nesting_1"], true,
+//         [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
+// 
+//     data2003 = flat_data.filter(function(d){
+//       return d.year == 2003;
+//     })
+// 
+//     data2003.map(function(d, i){
+//       d.active = Math.floor(Math.random()*2);
+//       d.nesting_0 = {"name":attrs[d.id.slice(0, 2)].name, "id":d.id.slice(0, 2)};
+//       d.nesting_1 = {"name":attrs[d.id.slice(0, 4)].name, "id":d.id.slice(0, 4)};
+//       d.nesting_2 = {"name":attrs[d.id.slice(0, 6)].name, "id":d.id.slice(0, 6)};
+//       // d.value = d.val_usd;
+//       data2003[i] = vizwhiz.utils.merge(d, attrs[d.id]);
+//     })
+//     
+//     // nest the flat data by nesting array
+//     var nested2003 = vizwhiz.utils.nest(data2003, ["nesting_0","nesting_1","nesting_2"], true,
+//         [{"key":"val_usd", "agg":"sum"}, {"key":"complexity", "agg":"avg"}, {"key":"distance", "agg":"avg"}, {"key":"color"}])
+//         
+//     console.log(nested2003);    
     // viz
     //   .text_var("name")
     //   .id_var("id")
@@ -570,7 +589,7 @@ d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(flat_da
 //       
 //     },2000)
 
-  })
-})
+//   })
+// })
 
 </script>

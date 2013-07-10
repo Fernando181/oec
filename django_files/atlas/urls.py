@@ -10,7 +10,7 @@ urlpatterns = patterns('',
   #(r'^redesign/', include('redesign.urls')),
   (r'^usa/', include('usa.urls')),
   (r'^redesign/', include('redesign.urls')),
-  
+  (r'^stock/$', 'observatory.views.stock'),
   ####                       
   ## Revisiting old patterns 
   ####                    

@@ -203,7 +203,7 @@ class Hs4_manager(models.Manager):
 
 	def get_all(self, lang):
 		products = self.filter_lang(lang)
-		products = products.filter(community__isnull=False, ps_size__isnull=False)
+		products = products.filter(community__isnull=False)#, ps_size__isnull=False)
 		return list(products.values(
 			"id",
 			"name",

@@ -460,6 +460,7 @@
   <script src="/media/js/libs/vizwiz/src/utils.js"></script>
   <script src="/media/js/libs/vizwiz/src/tooltip.js"></script>
   <script src="/media/js/libs/vizwiz/src/viz/tree_map.js"></script>
+  <script src="/media/js/libs/vizwiz/src/viz/viz.js"></script>
   
   <script>
 
@@ -467,9 +468,12 @@
     height = 550,
     margin = {top: 5, right: 40, bottom: 20, left: 120};
 
-  var viz = vizwhiz.viz.tree_map().height(520)
-	 																.width(640)
-																	.name_array(["name"]);
+  // var viz = vizwhiz.viz.tree_map().height(520)
+                                   // .width(640)
+                                  // .name_array(["name"]);
+                                  
+  var viz = vizwhiz.viz()                                  
+
   var flat_data,attr,complexity,
       year = "{{year}}";
      
@@ -478,8 +482,9 @@
     console.log(raw["data"]);
     flat_data=raw["data"]
     attr=raw["attr"]
-    
-    flat_data = flat_data.filter(function(d){ return d.year == year; })
+    d3.select('#viz').style('height','503px');
+    d3.select("#loader").style("display", "none");
+    // flat_data = flat_data.filter(function(d){ return d.year == year; })
     
     flat_data.map(function(d,i){
       
@@ -489,50 +494,65 @@
        
     })
     
-    var nested_raw = vizwhiz.utils.nest(flat_data, ["nesting_0"], false, [{"key":"color"}])
-    console.log(nested_raw);
-    
-    //raw.map(function())
     viz
+      .type("tree_map")
+      .height(520)
+      .width(640)
       .id_var("id")
       .text_var("name")
-      .value_var("value")
-      .tooltip_info(["distance", "complexity", "value"])
+      .value_var("val_usd")
+      .tooltip_info(["id","val_usd"])
+      .name_array(["name","id"])
+      .total_bar({"prefix": "Export Value: $", "suffix": " USD", "format": ",f"})
+      .nesting(["nesting_0","nesting_1","nesting_2"])
+      // .nesting_aggs({"distance":"mean","complexity":"mean"})
+      .depth("nesting_0")
+      .year(2010)
+    
+    // var nested_raw = vizwhiz.utils.nest(flat_data, ["nesting_0"], false, [{"key":"color"}])
+    // console.log(nested_raw);
+    
+    //raw.map(function())
+    // viz
+    //   .id_var("id")
+    //   .text_var("name")
+    //   .value_var("value")
+    //   .tooltip_info(["distance", "complexity", "value"])
 
     d3.select("#viz")
-      .datum(nested_raw)
+      .datum(flat_data)
       .call(viz)
   })
 
-  d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(raw_data){
-    d3.json("/media/js/libs/vizwiz/examples/data/attr_hs.json", function(attrs){
-    
-      var flat_data = raw_data.filter(function(d){
-        return d.year == 2010;
-      })
-      
-      flat_data.map(function(d, i){
-        d.nesting_0 = {"name":attrs[d.id.slice(0, 2)].name, "id":d.id.slice(0, 2)};
-        d.nesting_1 = {"name":attrs[d.id.slice(0, 4)].name, "id":d.id.slice(0, 4)};
-        d.nesting_2 = {"name":attrs[d.id.slice(0, 6)].name, "id":d.id.slice(0, 6)};
-        d.value = d.val_usd;
-        flat_data[i] = vizwhiz.utils.merge(d, attrs[d.id]);
-      })
-      
-      var nested_data = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1","nesting_2"], false, [{"key":"color"}])
-      // nested_data.children = nested_data.children.filter(filter_data)
-      console.log(nested_data);
-      return;
-			
-      viz
-        .id_var("id")
-        .text_var("name")
-        .value_var("value")
-        .tooltip_info(["distance", "complexity", "value"])
-  console.log(nested_data)
-      d3.select("#viz")
-        .datum(nested_data)
-        .call(viz)
+  // d3.json("/media/js/libs/vizwiz/examples/data/products_mg.json", function(raw_data){
+  //   d3.json("/media/js/libs/vizwiz/examples/data/attr_hs.json", function(attrs){
+  //   
+  //     var flat_data = raw_data.filter(function(d){
+  //       return d.year == 2010;
+  //     })
+  //     
+  //     flat_data.map(function(d, i){
+  //       d.nesting_0 = {"name":attrs[d.id.slice(0, 2)].name, "id":d.id.slice(0, 2)};
+  //       d.nesting_1 = {"name":attrs[d.id.slice(0, 4)].name, "id":d.id.slice(0, 4)};
+  //       d.nesting_2 = {"name":attrs[d.id.slice(0, 6)].name, "id":d.id.slice(0, 6)};
+  //       d.value = d.val_usd;
+  //       flat_data[i] = vizwhiz.utils.merge(d, attrs[d.id]);
+  //     })
+  //     
+  //     var nested_data = vizwhiz.utils.nest(flat_data, ["nesting_0","nesting_1","nesting_2"], false, [{"key":"color"}])
+  //     // nested_data.children = nested_data.children.filter(filter_data)
+  //     console.log(nested_data);
+  //     return;
+  //       
+  //     viz
+  //       .id_var("id")
+  //       .text_var("name")
+  //       .value_var("value")
+  //       .tooltip_info(["distance", "complexity", "value"])
+  //     console.log(nested_data)
+  //     d3.select("#viz")
+  //       .datum(nested_data)
+  //       .call(viz)
     
       // setTimeout(function(){
       //   
@@ -555,8 +575,8 @@
       //   
       // },4000)
     
-    })
-  })
+    // })
+  // })
 
   </script>
   

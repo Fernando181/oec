@@ -465,19 +465,32 @@
 <script>
 
 d3.select('#viz').style('height','590px');
-var viz = vizwhiz.viz().height(590).width(640).type("stacked")//.margin({"top": 20, "right": 40, "bottom": 80, "left": 90}).type("stacked")
-  //.nesting(["nesting_1","nesting_0"])
-  .xaxis_var(["year","Year"])
-  .value_var(["val_usd","Value (USD)"])
-  //.title("Title of the chart")
+// var viz = vizwhiz.viz().height(590).width(640).type("stacked")//.margin({"top": 20, "right": 40, "bottom": 80, "left": 90}).type("stacked")
+//   //.nesting(["nesting_1","nesting_0"])
+//   .xaxis_var(["year","Year"])
+//   .value_var(["val_usd","Value (USD)"])
+//   //.title("Title of the chart")
+//   .tooltip_info(["id", "complexity", "distance"])
+//   .text_var("name")
+//   // .small(true)
+//   .id_var("id");
+var viz = vizwhiz.viz()
+  .type("stacked")
+  .height(503)
+  .width(640)
+  .xaxis_var("year")
+  .value_var("val_usd")
   .tooltip_info(["id", "complexity", "distance"])
   .text_var("name")
-  // .small(true)
-  .id_var("id");
+  .id_var("id")
+  .total_bar({"prefix": "Export Value: $", "suffix": " USD", "format": ",f"})
+  .nesting(["nesting_0","nesting_1","nesting_2"])
+  .depth("nesting_0")
 
 var attr,flat_data,complexity;
 
 	d3.json("/redesign/api/complex/{{origin.name_3char}}/{{year}}", function(raw){
+    d3.select("#loader").style("display", "none");
 		var x = "{{year_end}}"
 		console.log(x);
     years = d3.range("{{year_start}}",parseInt("{{year_end}}"))
@@ -493,21 +506,19 @@ var attr,flat_data,complexity;
        
     })
     
-    years.forEach(function(entry) {
-		    console.log(entry);
-		    var entryData = flat_data.filter(function(d){return d.year == entry})
-		    var nestedEntry = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1","nesting_2"], true,
-		        [{"key":"val_usd", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
-				console.log(nestedEntry);		
-				data = data.concat(nestedEntry);	
-		});
+    // years.forEach(function(entry) {
+//         console.log(entry);
+//         var entryData = flat_data.filter(function(d){return d.year == entry})
+//         var nestedEntry = vizwhiz.utils.nest(entryData, ["nesting_0","nesting_1","nesting_2"], true,
+//             [{"key":"val_usd", "agg":"sum"}, {"key":"year"}, {"key":"color"}]);
+//         console.log(nestedEntry);    
+//         data = data.concat(nestedEntry);  
+//     });
     
-    
-		
-		console.log(data);
+  
 		
     d3.select("#viz")
-      .datum(data)
+      .datum(flat_data)
       .call(viz)
 	})
 

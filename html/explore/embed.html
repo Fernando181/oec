@@ -12,6 +12,7 @@
   
   <link rel="stylesheet" href="/media/css/normalize.css">
   <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow' rel='stylesheet' type='text/css' />  
+    <link href="/media/js/libs/vizwiz/src/vizwhiz.css" rel="stylesheet" type="text/css"> 
   <style>
   body {
     overflow: hidden;
@@ -60,17 +61,40 @@
 </head>
 <body>
 
-  <div id="dataviz"><img src="/media/img/all/loader.gif" alt="please be patient..." /> Loading...</div>
+  <div id="viz"></div>
+  <div id="loader">
+    <img src="/media/img/all/loader.gif" alt="loading" /><br />Loading...
+  </div>
 
   <!-- The JavaScript -->
   <!-- Libraries -->
   <script src="/media/js/libs/jquery/jquery-1.7.1.min.js"></script>
   <script src="/media/js/libs/d3/d3.v2.min.js"></script>
+
+  <script src="/media/js/libs/jquery-ui/jquery-ui.min.js"></script>
+  <script src="/media/js/libs/tipsy/tipsy.jquery.js" ></script>
+  <script src="/media/js/libs/chosen/chosen.jquery.min.js" ></script>
+  <script src="/media/js/libs/d3/d3.v2.min.js"></script>
   <!-- App -->
   <script src="/media/js/explore/general.js"></script>
-  {% if app == "tree_map" %}<script src="/media/js/apps/tree_map.js"></script>{% endif %}
+  <!-- {% if app == "tree_map" %}<script src="/media/js/apps/tree_map.js"></script>{% endif %}
   {% if app == "stacked" %}<script src="/media/js/apps/stacked.js"></script>{% endif %}
-  {% if app == "product_space" %}<script src="/media/js/apps/product_space.js"></script>{% endif %}
+  {% if app == "product_space" %}<script src="/media/js/apps/product_space.js"></script>{% endif %} -->
+    <script src="/media/js/libs/vizwiz/lib/d3.js"></script>
+    <script src="/media/js/libs/vizwiz/lib/modernizr.custom.js"></script>
+    <script src="/media/js/libs/vizwiz/src/general.js"></script>
+    <script src="/media/js/libs/vizwiz/src/utils.js"></script>
+    <script src="/media/js/libs/vizwiz/src/tooltip.js"></script>
+    <script src="/media/js/libs/vizwiz/src/utils.slider.js"></script>
+  <script src="/media/js/libs/vizwiz/src/viz/viz.js"></script>
+  {% if app == "tree_map" %}<script src="/media/js/libs/vizwiz/src/viz/tree_map.js"></script>{% endif %}
+  {% if app == "stacked" %}<script src="/media/js/libs/vizwiz/src/viz/stacked.js"></script>{% endif %}
+  {% if app == "pie_scatter" %}<script src="/media/js/libs/vizwiz/src/viz/pie_scatter.js"></script>{% endif %}
+  {% if app == "product_space" %}
+<script src="/media/js/libs/vizwiz/src/viz/network.js"></script>{% endif %}
+
+<script src="/media/js/explore/viz_general.js"></script> 
+
   <script>
   
   /*
@@ -125,11 +149,17 @@
     }
   })
   */
-  
-  var api_uri = "/api/{{trade_flow}}/{{country1}}/{{country2}}/{{product}}/{{year}}/?lang={{lang}}",
+  var app_name = "{{app}}",
+      year =  "{{year}}",
+      years_available = {{years_available|safe}},
+      embed = true,
+      api_uri = "/api/{{trade_flow}}/{{country1}}/{{country2}}/{{product}}/{{year}}/?lang={{lang}}";
     w = $(window).width(),
     h = $(window).height();
-  build_app(api_uri, "{{app}}", [w, h], "embed")
+  // build_app(api_uri, "{{app}}", [w, h], "embed")
+
+  build_viz_app(api_uri,w,h);
+  
   </script>
 </body>
 </html>

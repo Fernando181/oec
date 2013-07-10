@@ -615,7 +615,7 @@ text-decoration: none;
   text-align: center;
 }
 .app #main #content .key img {
-  width: 15px;
+  width: 25px;
 }
 .app #main #content .key#hs4 img {
   width: 25px;
@@ -624,7 +624,7 @@ text-decoration: none;
   padding: 2px 10px 2px 0;
 }
 .app #main #content .key#sitc1 img {
-  width: 30px;
+  width: 25px;
 }
 .app #main #content .key#sitc1 a {
   padding: 2px 10px 2px 0;
@@ -646,7 +646,7 @@ text-decoration: none;
  * Timeline
  */
 .app #main #content #timeline {
-  padding: 10px;
+  padding: 0px 10px 10px 10px;
   overflow: hidden;
 }
 .app #main #content #timeline button{
@@ -692,7 +692,7 @@ text-decoration: none;
   width: 600px;
 }
 .app #main #content #timeline #stacked_controls > div {
-  display: inline-block;
+  display: inline;
   margin: 0 25px 0 0;
   vertical-align: top;
 }
@@ -701,6 +701,7 @@ text-decoration: none;
 }
 .app #main #content #timeline #stacked_controls p {
   margin: 0;
+  display:inline;
 }
 
 .app #loader {

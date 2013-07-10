@@ -39,6 +39,9 @@ function Key() {
   function pretty_cats(attrs){
     cats = {}
     d3.values(attrs).forEach(function(d){
+      if (d.category_id==undefined){
+        return;
+      }
       cats[d.category_id] = {}
       d3.keys(d).forEach(function(dd){
         if(dd.indexOf("category") > -1){
@@ -53,7 +56,9 @@ function Key() {
   function pretty_sitcs(attrs){
     sitcs = {}
     d3.values(attrs).forEach(function(d){
- 
+      if (d.category_id==undefined){
+        return;
+      }
       sitcs[d.sitc1_id] = {}
       d3.keys(d).forEach(function(dd){
         
@@ -82,6 +87,7 @@ function Key() {
     else {
        a.style("background", function(d){ return d.color; })
         .attr("class", function(d){ return showing + " cat_"+d.id+" "+d.continent; })
+        .attr("continent", function(d){ return d.continent; })
         .text(function(d){ return name(d.name);})
     }
     // mouseover events (extends the specific apps highlight funciton)
@@ -125,8 +131,8 @@ function Key() {
                                    .style("cursor","")                 
                                    .attr("active","true"); 
           
-          app_name=="stacked" ? stack_solo_filter(d.continent) : d3.select("#viz").call(viz.solo([d.continent]));
-          // d3.select("#viz").call(viz.solo([d.continent]));
+          d3.select("#viz").call(viz.solo([d.continent]));
+          // app_name=="stacked" ? stack_solo_filter(d.continent) : d3.select("#viz").call(viz.solo([d.continent]));
         }
         // or we can simply filter by product community name
         else 
@@ -135,8 +141,8 @@ function Key() {
                          .style("pointer-events","auto")  
                          .style("cursor","")                 
                          .attr("active","true"); 
-                         
-          app_name=="stacked" ? stack_solo_filter(d.name) : d3.select("#viz").call(viz.solo([d.name]));
+          d3.select("#viz").call(viz.solo([d.name]));               
+          // app_name=="stacked" ? stack_solo_filter(d.name) : d3.select("#viz").call(viz.solo([d.name]));
           
         }              
                        
@@ -173,7 +179,7 @@ function Key() {
       var use_this
       if (nest_level == "nest0"){
         //if we're display countries sort by 2nd tier 
-        (app_type=="csay"||app_type=="ccsy"||app_type=="sapy") ? 
+        (app_type=="csay"||app_type=="cspy"||app_type=="sapy") ? 
         use_this = nest1_value : use_this = nest0_value
       } else if(nest_level == "nest1"){ 
         use_this = nest1_value  

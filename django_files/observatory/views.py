@@ -12,7 +12,7 @@ import json
 from django.utils.translation import gettext as _
 # App specific
 from observatory.models import *
-from redesign.helpers import get_question
+import msgpack
 # Import for cache
 if settings.REDIS:
   from django.core.cache import cache, get_cache
@@ -26,6 +26,11 @@ if settings.REDIS:
   
 def fluid(request):
   return render_to_response("fluid.html", context_instance=RequestContext(request))
+
+def stock(request):
+  json_res = {}
+  json_res["hs4"] = Hs4.objects.get_all("en")
+  return render_to_response("stock.html",{"hs4":json.dumps(json_res)}, context_instance=RequestContext(request))  
   
 ###################
 ## Abandoned function? Does nothing.
@@ -48,7 +53,6 @@ def home(request):
     c = Country.objects.get(name_2char=country_code)
   except Country.DoesNotExist:
     c = Country.objects.get(name_2char="us")
-  
   return render_to_response("home.html", 
     {"default_country": c},
     context_instance=RequestContext(request))
@@ -116,10 +120,12 @@ def set_product_classification(request, prod_class):
   if not next:
     next = '/'
   response = HttpResponseRedirect(next)
+
   if prod_class:
     if hasattr(request, 'session'):
       request.session['product_classification'] = prod_class
       request.session['classification'] = prod_class
+      request.session['swap'] = True 
   return response
 
 def download(request):
@@ -128,7 +134,7 @@ def download(request):
   except:
     pass
   import csv
-  raise Exception(request.POST)
+  #raise Exception(request.POST)
   content = request.POST.get("content")
   
   title = request.POST.get("title")
@@ -181,7 +187,7 @@ def app(request, app_name, trade_flow, filter, year):
   
   trade_flow_list = ["export", "import", "net_export", "net_import"]
   
-  year1_list = range(1962, 2010, 1)
+  year1_list = range(1962, 2011, 1)
   if "." in year:
     y = [int(x) for x in year.split(".")]
     year = range(y[0], y[1]+1, y[2])
@@ -312,7 +318,8 @@ def app_redirect(request, app_name, trade_flow, filter, year):
   # raise Exception("/explore/%s/%s/%s/%s/%s/%s/" % (app_name, trade_flow, country1, country2, product, year))
   return HttpResponsePermanentRedirect("/explore/%s/%s/%s/%s/%s/%s/" % (app_name, trade_flow, country1, country2, product, year))
 
-def explore(request, app_name, trade_flow, country1, country2, product, year="2010"):
+def explore(request, app_name, trade_flow, country1, country2, product, year="2011"):
+  
   # raise Exception(country1, country2, product, year)
   # Get URL query parameters
   was_redirected = request.GET.get("redirect", False)
@@ -327,7 +334,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   prod_class = request.GET.get("product_classification", prod_class)
   options["product_classification"] = prod_class
   options = options.urlencode()
-
+  
   # get distince years from db, different for diff product classifications
   years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
   years_available.sort()
@@ -361,7 +368,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   year1_list = range(years_available[0], years_available[len(years_available)-1]+1, 1)
 
   if app_name == "stacked" and year == "2009":
-    year = "1969.2010.10"
+    year = "1969.2011.10"
   if "." in year:
     y = [int(x) for x in year.split(".")]
     # year = range(y[0], y[1]+1, y[2])
@@ -438,7 +445,11 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
   
   if not alert:
     if app_type == "casy":
-      title = "What does %s %s?" % (countries[0].name, trade_flow.replace("_", " "))
+      # raise Exception(app_name)
+      if app_name == "pie_scatter":
+        title = "What products are feasible for %s?" % countries[0].name
+      else:  
+        title = "What does %s %s?" % (countries[0].name, trade_flow.replace("_", " "))
 
     # Country but showing other country trade partners
     elif app_type == "csay":
@@ -467,6 +478,12 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
       article = "to" if trade_flow == "export" else "from"
       title = "Where does %s %s %s %s?" % (countries[0].name, trade_flow, product.name_en, article)
   
+  
+  if 'swap' in request.session:
+    if request.session['swap']:
+      year_start = years_available[0]
+      year_end = years_available[-1]
+      request.session['swap'] = False
   # Return page without visualization data
   
   return render_to_response("explore/index.html", {
@@ -476,7 +493,7 @@ def explore(request, app_name, trade_flow, country1, country2, product, year="20
     "years_available": years_available,
     "data_as_text": data_as_text,
     "app_name": app_name,
-    "title": get_question(app_type, trade_flow=trade_flow,origin=countries[0],destination=countries[1],product=product),
+    "title": title,#get_question(app_type, trade_flow=trade_flow,origin=countries[0],destination=countries[1],product=product),
     "trade_flow": trade_flow,
     "country1": countries[0] or country1,
     "country2": countries[1] or country2,
@@ -518,16 +535,41 @@ def api_casy(request, trade_flow, country1, year):
   
   '''Grab extraneous details'''
   ## Clasification & Django Data Call
+  name = "name_%s" % lang
+
+  # Get attribute information  
   if prod_class == "sitc4":
-    attr_list = list(Sitc4.objects.all().values('code','name','color')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    world_trade = list(Sitc4_py.objects.all().values('year','product_id','world_trade'))
+    attr_list = list(Sitc4.objects.all().values('code',name,'id','color'))
+    attr = {}
+    for i in attr_list: 
+      attr[i['code']] = {'code':i['code'],'name':i[name],'color':i['color']}
+     #.extra(where=['CHAR_LENGTH(code) = 2'])
     
   elif prod_class == "hs4":
-    attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    world_trade = list(Hs4_py.objects.all().values('year','product_id','world_trade'))
+    attr_list = list(Hs4.objects.all().values('code',name,'id','community_id__color'))
+    attr = {}
+    for i in attr_list: 
+      attr[i['code']] = {'code':i['code'],'name':i[name],'item_id':i['id'],'color':i['community_id__color']}
+     #.extra(where=['CHAR_LENGTH(code) = 2'])
+  
+  # get distince years from db, different for diff product classifications
+  years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  years_available.sort()
     
-  # Get attribute information
-  attr = {}
-  for i in attr_list: 
-    attr[i['code']] = i
+  magic = Cy.objects.filter(country=country1.id,
+                            year__range=(years_available[0],
+                                        years_available[-1])).values('year',
+                                                                    'pc_constant',
+                                                                    'pc_current',
+                                                                    'notpc_constant')
+  magic_numbers = {}
+  for i in magic: 
+    magic_numbers[i['year']] = {"pc_constant":i['pc_constant'], 
+                                "pc_current":i['pc_current'],
+                                "notpc_constant":i["notpc_constant"]}
+                                                           
   
   '''Define parameters for query'''
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
@@ -545,12 +587,12 @@ def api_casy(request, trade_flow, country1, year):
   
   """Create query [year, id, abbrv, name_lang, val, export_rca]"""
   q = """
-    SELECT year, p.id, p.code, p.name_%s, p.community_id, c.color,c.name, %s, %s
-    FROM observatory_%s_cpy as cpy, observatory_%s as p, observatory_%s_community as c 
-    WHERE country_id=%s and cpy.product_id = p.id %s and p.community_id = c.id
+    SELECT cpy.year, p.id, p.code, p.name_%s, p.community_id, c.color,c.name, %s, %s, distance, opp_gain, py.pci
+    FROM observatory_%s_cpy as cpy, observatory_%s as p, observatory_%s_community as c, observatory_%s_py as py 
+    WHERE country_id=%s and cpy.product_id = p.id %s and p.community_id = c.id and py.product_id=p.id and cpy.year=py.year
     HAVING val > 0
     ORDER BY val DESC
-    """ % (lang, val_col, rca_col, prod_class, prod_class, prod_class, country1.id, year_where)
+    """ % (lang, val_col, rca_col, prod_class, prod_class, prod_class, prod_class, country1.id, year_where)
   
   """Prepare JSON response"""
   json_response = {}
@@ -588,7 +630,8 @@ def api_casy(request, trade_flow, country1, year):
     # raise Exception(q,r,(r[7]/total_val)*100)
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[8], "share": (r[7] / total_val)*100,
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[8], 
+             "distance":r[9],"opp_gain":r[10], "pci": r[11], "share": (r[7] / total_val)*100,
              "community_id": r[4], "color": r[5], "community_name":r[6], "code":r[2], "id": r[2]} for r in rows]
     
     
@@ -604,8 +647,11 @@ def api_casy(request, trade_flow, country1, year):
   json_response["year"] = year
   json_response["item_type"] = "product"
   json_response["app_type"] = "casy"
-  json_response["class"] =  prod_class
+  json_response["magic_numbers"] = magic_numbers
+  json_response["world_trade"] = world_trade
+  json_response["prod_class"] =  prod_class
   json_response["other"] = query_params
+
   # raise Exception(time.time() - start)
   """Return to browser as JSON for AJAX request"""
   return HttpResponse(json.dumps(json_response))
@@ -626,16 +672,23 @@ def api_sapy(request, trade_flow, product, year):
   
   '''Grab extraneous details'''
   ## Clasification & Django Data Call
+  name = "name_%s" % lang
+  
+  '''Grab extraneous details'''
   if prod_class == "sitc4":
-    attr_list = list(Sitc4.objects.all().values('code','name','color')) #.extra(where=['CHAR_LENGTH(code) = 2'])
-    
+    # attr_list = list(Sitc4.objects.all().values('code','name','color'))
+    attr_list = list(Sitc4.objects.all().values('code',name,'id','color'))
+    attr = {}
+    for i in attr_list: 
+      attr[i['code']] = {'code':i['code'],'name':i[name],'color':i['color']}
+     #.extra(where=['CHAR_LENGTH(code) = 2'])
   elif prod_class == "hs4":
-    attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    # attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    attr_list = list(Hs4.objects.all().values('code',name,'id','community_id__color'))
+    attr = {}
+    for i in attr_list: 
+      attr[i['code']] = {'code':i['code'],'name':i[name],'item_id':i['id'],'color':i['community_id__color']}
     
-  # Create dictiontary with product codes
-  attr = {}
-  for i in attr_list: 
-    attr[i['code']] = i
     
   # Create dictionary of region codes  
   region_list = list(Country_region.objects.all().values()) #.extra(where=['CHAR_LENGTH(code) = 2'])
@@ -647,7 +700,7 @@ def api_sapy(request, trade_flow, product, year):
   continent_list = list(Country.objects.all().distinct().values('continent'))
   continents = {}
   for i,k in enumerate(continent_list): 
-     continents[k['continent']] = i*1000  
+     continents[k['continent']] = i*1000
   
   """Define parameters for query"""
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
@@ -708,7 +761,7 @@ def api_sapy(request, trade_flow, product, year):
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
     rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[6], "rca":r[7], "share": (r[6] / total_val)*100,
-             "id": r[1]*10000, "region_id":r[4],"continent":r[5]} for r in rows]
+             "id": r[1], "region_id":r[4],"continent":r[5]} for r in rows]
   
     if crawler == "":
       return [rows, total_val, ["#", "Year", "Abbrv", "Name", "Value", "RCA", "%"]]
@@ -754,6 +807,22 @@ def api_csay(request, trade_flow, country1, year):
   for i,k in enumerate(continent_list): 
      continents[k['continent']] = i*1000
   
+  # get distince years from db, different for diff product classifications
+  years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  years_available.sort()
+  
+  magic = Cy.objects.filter(country=country1.id,
+                            year__range=(years_available[0],
+                                        years_available[-1])).values('year',
+                                                                    'pc_constant',
+                                                                    'pc_current',
+                                                                    'notpc_constant')
+  magic_numbers = {}
+  for i in magic: 
+    magic_numbers[i['year']] = {"pc_constant":i['pc_constant'], 
+                                "pc_current":i['pc_current'],
+                                "notpc_constant":i["notpc_constant"]}
+  
   """Define parameters for query"""
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -775,7 +844,7 @@ def api_csay(request, trade_flow, country1, year):
     HAVING val > 0
     ORDER BY val DESC
     """ % (lang, val_col, rca_col, prod_class, country1.id, year_where)
-  
+
   """Prepare JSON response"""
   json_response = {}
   
@@ -835,6 +904,7 @@ def api_csay(request, trade_flow, country1, year):
   json_response["region"]= region
   json_response["continents"]= continents
   json_response["class"] =  prod_class
+  json_response["magic_numbers"] = magic_numbers
   json_response["other"] = query_params
     
   """Return to browser as JSON for AJAX request"""
@@ -857,17 +927,39 @@ def api_ccsy(request, trade_flow, country1, country2, year):
   query_params = request.GET.copy()
   query_params["lang"] = lang
   query_params["product_classification"] = prod_class
+  # Get Name in proper lang
+  name = "name_%s" % lang
   
   '''Grab extraneous details'''
   if prod_class == "sitc4":
-    attr_list = list(Sitc4.objects.all().values('code','name','color')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    # attr_list = list(Sitc4.objects.all().values('code','name','color'))
+    attr_list = list(Sitc4.objects.all().values('code',name,'id','color'))
+    attr = {}
+    for i in attr_list: 
+      attr[i['code']] = {'code':i['code'],'name':i[name],'color':i['color']}
+     #.extra(where=['CHAR_LENGTH(code) = 2'])
   elif prod_class == "hs4":
-    attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    # attr_list = list(Hs4.objects.all().values('code','name')) #.extra(where=['CHAR_LENGTH(code) = 2'])
+    attr_list = list(Hs4.objects.all().values('code',name,'id','community_id__color'))
+    attr = {}
+    for i in attr_list: 
+      attr[i['code']] = {'code':i['code'],'name':i[name],'item_id':i['id'],'color':i['community_id__color']}
+
+  # get distince years from db, different for diff product classifications
+  years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  years_available.sort()
   
-  attr = {}
-  for i in attr_list: 
-    attr[i['code']] = i
-  
+  magic = Cy.objects.filter(country=country1.id,
+                            year__range=(years_available[0],
+                                        years_available[-1])).values('year',
+                                                                    'pc_constant',
+                                                                    'pc_current',
+                                                                    'notpc_constant')
+  magic_numbers = {}
+  for i in magic: 
+    magic_numbers[i['year']] = {"pc_constant":i['pc_constant'], 
+                                "pc_current":i['pc_current'],
+                                "notpc_constant":i["notpc_constant"]}
   
   '''Define parameters for query'''
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
@@ -883,7 +975,7 @@ def api_ccsy(request, trade_flow, country1, country2, year):
     
   '''Create query'''
   q = """
-    SELECT year, p.id, p.code, p.name_%s, p.community_id, c.name, c.color, %s, %s 
+    SELECT year, p.id, p.code, p.name_%s, p.community_id, c.name, c.color, %s, %s
     FROM observatory_%s_ccpy as ccpy, observatory_%s as p, observatory_%s_community as c 
     WHERE origin_id=%s and destination_id=%s and ccpy.product_id = p.id and p.community_id = c.id %s
     HAVING val > 0
@@ -925,7 +1017,8 @@ def api_ccsy(request, trade_flow, country1, country2, year):
   
     """Add percentage value to return vals"""
     # rows = [list(r) + [(r[4] / total_val)*100] for r in rows]
-    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[5], "share": (r[7] / total_val)*100,
+    rows = [{"year":r[0], "item_id":r[1], "abbrv":r[2], "name":r[3], "value":r[7], "rca":r[5], 
+             "share": (r[7] / total_val)*100,
              "community_id":r[4],"community_name":r[5],"color":r[6], "code":r[2], "id": r[2]} for r in rows]
   
     if crawler == "":
@@ -940,8 +1033,10 @@ def api_ccsy(request, trade_flow, country1, country2, year):
   json_response["year"] = year
   json_response["item_type"] = "product"
   json_response["app_type"] = "ccsy"
+  json_response["prod_class"] =  prod_class
   json_response["attr"] = attr
   json_response["class"] =  prod_class
+  json_response["magic_numbers"] = magic_numbers
   json_response["other"] = query_params
 
   """Return to browser as JSON for AJAX request"""
@@ -973,7 +1068,23 @@ def api_cspy(request, trade_flow, country1, product, year):
   continents = {}
   for i,k in enumerate(continent_list): 
      continents[k['continent']] = i*1000
+
+  # get distince years from db, different for diff product classifications
+  years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  years_available.sort()
   
+  magic = Cy.objects.filter(country=country1.id,
+                            year__range=(years_available[0],
+                                        years_available[-1])).values('year',
+                                                                    'pc_constant',
+                                                                    'pc_current',
+                                                                    'notpc_constant')
+  magic_numbers = {}
+  for i in magic: 
+    magic_numbers[i['year']] = {"pc_constant":i['pc_constant'], 
+                                "pc_current":i['pc_current'],
+                                "notpc_constant":i["notpc_constant"]}
+                                
   '''Define parameters for query'''
   year_where = "AND year = %s" % (year,) if crawler == "" else " "
   rca_col = "null"
@@ -1054,6 +1165,7 @@ def api_cspy(request, trade_flow, country1, product, year):
   json_response["region"]= region
   json_response["app_type"] = "cspy"
   json_response["class"] =  prod_class
+  json_response["magic_numbers"] = magic_numbers
   json_response["other"] = query_params
   
   '''Return to browser as JSON for AJAX request'''
@@ -1066,7 +1178,11 @@ def embed(request, app_name, trade_flow, country1, country2, product, year):
   prod_class = request.GET.get("product_classification", prod_class)
   query_string = request.GET.copy()
   query_string["product_classification"] = prod_class
-  return render_to_response("explore/embed.html", {"app":app_name, "trade_flow": trade_flow, "country1":country1, "country2":country2, "product":product, "year":year, "other":json.dumps(query_string), "lang":lang})
+  # get distince years from db, different for diff product classifications
+  years_available = list(Sitc4_cpy.objects.values_list("year", flat=True).distinct()) if prod_class == "sitc4" else list(Hs4_cpy.objects.values_list("year", flat=True).distinct())
+  years_available.sort()
+  
+  return render_to_response("explore/embed.html", {"app":app_name, "trade_flow": trade_flow, "country1":country1, "country2":country2, "product":product, "year":year, "other":json.dumps(query_string),"years_available":json.dumps(years_available), "lang":lang})
 
 
 
