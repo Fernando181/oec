@@ -5,7 +5,7 @@ function App() {
     highlight = null,
     layout = "value",
     order = "community",
-    // attr_data,
+    attr_data,
     current_years_sum,
     year = 1962,
     color_gradient;
@@ -14,7 +14,7 @@ function App() {
     selection.each(function(data, i) {
       
       color_gradient = ["#f2ecb4", "#f2e671", "#f6d626", "#f9b344", "#eb8c30", "#e84d24"]
-      //attr_data = data["attr_data"]
+      attr_data = data["attr_data"]
 
       geo_data = get_world_geography();
       
@@ -55,8 +55,9 @@ function App() {
       //////////////////////////////////////////////////
       // Draw countries
       var map_projection = d3.geo.mercator()
-        .scale(660)
-        .translate([310, 220]);	
+        .scale(90)
+        .precision(.1)
+        .translate([310, 220]);  
 
       var value_range = get_range(current_years_data, 5);
       var value_range_big = get_range(current_years_data, 10);
