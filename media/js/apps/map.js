@@ -5,7 +5,7 @@ function App() {
     highlight = null,
     layout = "value",
     order = "community",
-    attr_data,
+    // attr_data,
     current_years_sum,
     year = 1962,
     color_gradient;
@@ -14,14 +14,17 @@ function App() {
     selection.each(function(data, i) {
       
       color_gradient = ["#f2ecb4", "#f2e671", "#f6d626", "#f9b344", "#eb8c30", "#e84d24"]
-      attr_data = data.attr_data;
-      var geo_data = get_world_geography();
+      //attr_data = data["attr_data"]
+
+      geo_data = get_world_geography();
       
       // trim data to current year and make sure we have attribute data
       current_years_data = data.data.filter(function(d){
         return d.year == year && attr_data[d.item_id];
       })
+      
       current_years_sum = d3.sum(current_years_data, function(d){ return d.value; });
+
       // merge data values with attributes array
       current_years_data.forEach(function(d){
         if(geo_data.features[d.item_id]){

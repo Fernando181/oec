@@ -92,7 +92,7 @@ function Key() {
     }
     // mouseover events (extends the specific apps highlight funciton)
     a.on("mouseover", function(d){
-        console.log(d);
+        
         // d3.select("#viz").call(viz.solo([d.name]));
         // d3.select("#viz").call(viz.highlight(d.id));
       })

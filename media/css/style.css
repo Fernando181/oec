@@ -621,7 +621,7 @@ text-decoration: none;
   width: 25px;
 }
 .app #main #content .key#hs4 a {
-  padding: 2px 10px 2px 0;
+/*  padding: 2px 10px 2px 0;*/
 }
 .app #main #content .key#sitc1 img {
   width: 25px;
@@ -702,6 +702,17 @@ text-decoration: none;
 .app #main #content #timeline #stacked_controls p {
   margin: 0;
   display:inline;
+}
+
+.app #main #content #timeline #pie_controls p {
+  margin: 0;
+  display:inline;
+}
+
+.app #main #content #timeline #pie_controls > div {
+  display: inline;
+  margin: 0 25px 0 0;
+  vertical-align: top;
 }
 
 .app #loader {
