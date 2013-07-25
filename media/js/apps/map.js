@@ -15,7 +15,7 @@ function App() {
       
       color_gradient = ["#f2ecb4", "#f2e671", "#f6d626", "#f9b344", "#eb8c30", "#e84d24"]
       attr_data = data["attr_data"]
-
+      console.log(attr_data)
       geo_data = get_world_geography();
       
       // trim data to current year and make sure we have attribute data
@@ -29,10 +29,12 @@ function App() {
       current_years_data.forEach(function(d){
         if(geo_data.features[d.item_id]){
           $.extend(attr_data[d.item_id], d)
-          $.extend(geo_data.features[d.item_id].properties, attr_data[d.item_id])
+          console.log(d)
+          $.extend(geo_data.features[d.item_id].properties, attr_data[d.item_id])  
         }
       })
       
+      console.log(geo_data)
       // Select the svg element, if it exists.
       var svg = d3.select(this).selectAll("svg").data([data]);
       
