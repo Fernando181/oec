@@ -9,12 +9,12 @@ function Controls() {
     selection.each(function(data, i) {
       
       // Update year in title
-      var year_title = ''+year;
-      if(year_title.indexOf(".") > -1){
-        year_title = year_title.replace(".", " ")
-        year_title = year_title.substr(0, year_title.indexOf("."))
-      }
-      $(".app_title#icons h2").text(year_title)
+      // var year_title = ''+year;
+      // if(year_title.indexOf(".") > -1){
+      //   year_title = year_title.replace(".", " ")
+      //   year_title = year_title.substr(0, year_title.indexOf("."))
+      // }
+      // $(".app_title#icons h2").text(year_title)
       
       // Update year in dropdown
       if(app_type == "stacked"){

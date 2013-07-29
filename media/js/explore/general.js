@@ -1,7 +1,7 @@
 function build_app(api_uri, type_of_app, dimensions, embed){
   
   // show loading icon and clear current HTML container
-  d3.select("#dataviz").html("")
+  d3.select("#viz").html("")
   d3.select("#loader").style("display", "block");
   
   // get data from server
@@ -27,7 +27,7 @@ function build_app(api_uri, type_of_app, dimensions, embed){
 
     // call app function (depending on which is loaded with the page)
     // on the given selection(s)
-    d3.select("#dataviz")
+    d3.select("#viz")
       .style("height", dimensions[1]+"px")
       .datum(data)
       .call(app);
@@ -135,7 +135,7 @@ function make_mouseover(options){
     $("#mouseover").remove();
   }
   
-  var cont = $("<div id='mouseover'>").appendTo("#dataviz");
+  var cont = $("<div id='mouseover'>").appendTo("#viz");
   
   var cat = $("<div id='mouseover_cat'>").appendTo("#mouseover");
   cat.css("background", options.category_color)
@@ -154,12 +154,12 @@ function make_mouseover(options){
     })
   }
   
-  var left = d3.mouse(d3.select("#dataviz").node())[0];
+  var left = d3.mouse(d3.select("#viz").node())[0];
   left = (left + $("#mouseover").width()/2) > options.width ? options.width - $("#mouseover").width()/2 : left;
   left = (left - $("#mouseover").width()/2) < 0 ? $("#mouseover").width()/2 : left;
   
-  var top = d3.mouse(d3.select("#dataviz").node())[1] - $("#mouseover").height() - 40;
-  top = top < 0 ? d3.mouse(d3.select("#dataviz").node())[1] + 40 : top;
+  var top = d3.mouse(d3.select("#viz").node())[1] - $("#mouseover").height() - 40;
+  top = top < 0 ? d3.mouse(d3.select("#viz").node())[1] + 40 : top;
   
   cont.css({
     "left": left - ($("#mouseover").width()/2),

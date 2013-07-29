@@ -39,7 +39,7 @@ function Key() {
   function pretty_cats(attrs){
     cats = {}
     d3.values(attrs).forEach(function(d){
-      if (d.category_id==undefined){
+      if (d.category_id==undefined || d.category_id==916){
         return;
       }
       cats[d.category_id] = {}
@@ -102,7 +102,7 @@ function Key() {
       })
     a.on("click", function(d){
       // If this node is already selected, return to unsorted
-      console.log(d3.select(this))
+      // console.log(d3.select(this))
       if (d3.select(this).attr("active") == "true")
       {
         d3.select("#viz").call(viz.solo([]));

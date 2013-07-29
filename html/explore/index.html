@@ -139,15 +139,15 @@
               </ul>
               <h4>{% trans "Products" %}</h4>
               <ul>
-                <li><a class="sapy" href="/explore/tree_map/export/show/all/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Exports To Destination" %}</a></li>
-                <li><a class="sapy" href="/explore/tree_map/import/show/all/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Imports From Origin" %}</a></li>
+                <li><a class="sapy" href="/explore/tree_map/export/show/all/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Exports To Destination" %}</a></li>
+                <li><a class="sapy" href="/explore/tree_map/import/show/all/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Imports From Origin" %}</a></li>
               </ul>
               <h4>{% trans "Bilateral" %}</h4>
               <ul>
                 <li><a class="ccsy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/{% if country_code == "chn"%}usa{%else %}chn{%endif%}/show/2011/">{% trans "Exports To Destination" %}</a></li>
                 <li><a class="ccsy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/{% if country_code == "chn"%}usa{%else %}chn{%endif%}/show/2011/">{% trans "Imports From Origin" %}</a></li>
-                <li><a class="cspy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Exports by Product" %}</a></li>
-                <li><a class="cspy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Imports by Product" %}</a></li>
+                <li><a class="cspy" href="/explore/tree_map/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Exports by Product" %}</a></li>
+                <li><a class="cspy" href="/explore/tree_map/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/2011/">{% trans "Imports by Product" %}</a></li>
               </ul>
             </div>
           </div>
@@ -168,15 +168,15 @@
               </ul>
               <h4>{% trans "Products" %}</h4>
               <ul>
-                <li><a class="sapy" href="/explore/stacked/export/show/all/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Exports To Destination" %}</a></li>
-                <li><a class="sapy" href="/explore/stacked/import/show/all/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Imports From Origin" %}</a></li>
+                <li><a class="sapy" href="/explore/stacked/export/show/all/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Exports To Destination" %}</a></li>
+                <li><a class="sapy" href="/explore/stacked/import/show/all/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Imports From Origin" %}</a></li>
               </ul>
               <h4>{% trans "Bilateral" %}</h4>
               <ul>
                 <li><a class="ccsy" href="/explore/stacked/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/{% if country_code == "chn"%}usa{%else %}chn{%endif%}/show/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Exports To Destination" %}</a></li>
                 <li><a class="ccsy" href="/explore/stacked/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/{% if country_code == "chn"%}usa{%else %}chn{%endif%}/show/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Imports From Origin" %}</a></li>
-                <li><a class="cspy" href="/explore/stacked/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Exports by Product" %}</a></li>
-                <li><a class="cspy" href="/explore/stacked/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if item_type == "countries" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Imports by Product" %}</a></li>
+                <li><a class="cspy" href="/explore/stacked/export/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Exports by Product" %}</a></li>
+                <li><a class="cspy" href="/explore/stacked/import/{% if country_code != None%}{{country_code}}{%else %}usa{% endif %}/show/{% if product_code != "all"  %}{% if product_code != "show" %}{{product_code}}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}{%else%}{% if product_classification == "sitc4" %}3330{% else %}2709{% endif %}{% endif %}/{%if product_classification == "sitc4"%}1965.2005.5{% else %}1995.2011.2{% endif %}/">{% trans "Imports by Product" %}</a></li>
               </ul>
             </div>
           </div>
@@ -274,7 +274,7 @@
                <input type="radio" id="opp_gain" name="yvar" /><label for="opp_gain">Opportunity Gain</label>
              </div>
              <div id="pie_spot">
-               <p>Spotlight:</p>
+               <p>Missing products only:</p>
                <input type="radio" id="spot_off" name="pie_spot" checked="checked" /><label for="spot_off">Off</label>
                <input type="radio" id="spot_on" name="pie_spot" /><label for="spot_on">On</label>
              </div>
@@ -430,6 +430,7 @@
           </select>
         </div>
         {% if app_name != "product_space" %}
+        {% if app_name != "map" %}
         <div class="nesting" style="float:right;">
           <span class="">Detail:</span>
           <select id="nesting_level" name="nesting" onchange="nest_drop_report(this.value)"> 
@@ -443,6 +444,7 @@
             <option value="nesting_2">Hi</option>
           </select>
         </div>  
+        {% endif %}
         {% endif %}
       </div>
       

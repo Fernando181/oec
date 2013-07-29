@@ -540,6 +540,7 @@ def api_casy(request, trade_flow, country1, year):
   lang = request.GET.get("lang", lang)
   crawler = request.GET.get("_escaped_fragment_", False)
   country1 = Country.objects.get(name_3char=country1)
+  scatter = distance_set(country1.id)
   
   '''Set query params with our changes'''
   query_params = request.GET.copy()
@@ -666,6 +667,7 @@ def api_casy(request, trade_flow, country1, year):
   json_response["world_trade"] = world_trade
   json_response["prod_class"] =  prod_class
   json_response["other"] = query_params
+  json_response["scatter"] = scatter
 
   # raise Exception(time.time() - start)
   """Return to browser as JSON for AJAX request"""
@@ -1279,6 +1281,11 @@ def clean_country(country):
     except Country.DoesNotExist:
       c = None
   return c
+  
+def distance_set(arg):
+  lookups = set([4L, 5L, 7L, 8L, 9L, 12L, 13L, 14L, 19L, 20L, 23L, 24L, 27L, 28L, 34L, 35L, 37L, 38L, 39L, 40L, 41L, 42L, 45L, 46L, 49L, 50L, 53L, 54L, 55L, 60L, 61L, 64L, 65L, 66L, 67L, 69L, 72L, 73L, 74L, 75L, 77L, 81L, 84L, 88L, 89L, 91L, 93L, 94L, 96L, 97L, 98L, 99L, 101L, 102L, 103L, 104L, 105L, 106L, 107L, 108L, 109L, 112L, 114L, 116L, 117L, 118L, 119L, 125L, 129L, 131L, 133L, 135L, 136L, 139L, 142L, 143L, 145L, 148L, 150L, 151L, 152L, 154L, 160L, 161L, 162L, 164L, 166L, 168L, 169L, 170L, 171L, 172L, 174L, 175L, 177L, 178L, 179L, 181L, 182L, 183L, 186L, 187L, 188L, 189L, 192L, 195L, 200L, 201L, 202L, 205L, 207L, 208L, 209L, 211L, 214L, 215L, 216L, 218L, 219L, 220L, 222L, 223L, 224L, 226L, 228L, 233L, 235L, 236L, 237L])  
+  return arg in lookups
+
 
 def clean_product(product, prod_class):
   # first try looking up based on 3 character code
